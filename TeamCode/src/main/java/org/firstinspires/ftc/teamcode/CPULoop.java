@@ -31,10 +31,10 @@ public class CPULoop extends UserDriveLoop {
 
         double liftPower;
         if (gp1.right_trigger > 0.5 && (Math.abs(lift.getCurrentPosition()) < 12300 || gp1.dpad_left)) {
-            liftPower = 1;
+            liftPower = -1;
             liftTarget = lift.getCurrentPosition();
         } else if (gp1.left_trigger > 0.5 && (lift.getCurrentPosition() > 0 || gp1.dpad_left)){
-            liftPower = -1;
+            liftPower = 1;
             liftTarget = lift.getCurrentPosition();
         } else {
             liftPower = liftController.getOutput(liftTarget - lift.getCurrentPosition(), 0);
