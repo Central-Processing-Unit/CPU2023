@@ -33,7 +33,7 @@ public class CPULoop extends UserDriveLoop {
         if (gp1.right_trigger > 0.5 && (Math.abs(lift.getCurrentPosition()) < 12300 || gp1.dpad_left)) {
             liftPower = -1;
             liftTarget = lift.getCurrentPosition();
-        } else if (gp1.left_trigger > 0.5 && (lift.getCurrentPosition() > 0 || gp1.dpad_left)){
+        } else if (gp1.left_trigger > 0.5 && (Math.abs(lift.getCurrentPosition()) > 0 || gp1.dpad_left)){
             liftPower = 1;
             liftTarget = lift.getCurrentPosition();
         } else {

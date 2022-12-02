@@ -21,6 +21,8 @@ public class CPUTeleop extends LinearOpMode {
                 .setTeleopValues(1, .6)
 //                .addAccessory(new Accessory(AccessoryType.WEBCAM, "webcam"))
                 .setOpMode(this)
+                .useCV()
+                .setIMUOffset(-Math.PI)
                 .build();
 
         HardwareManager manager = new HardwareManager(config, hardwareMap);
