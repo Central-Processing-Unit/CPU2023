@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.chsrobotics.ftccore.engine.navigation.control.PID;
 import com.chsrobotics.ftccore.hardware.HardwareManager;
 import com.chsrobotics.ftccore.hardware.config.Config;
 import com.chsrobotics.ftccore.hardware.config.accessory.Accessory;
@@ -9,14 +8,12 @@ import com.chsrobotics.ftccore.pipeline.Pipeline;
 import com.chsrobotics.ftccore.utilities.ComputerVision;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.PIDCoefficients;
 
 import org.firstinspires.ftc.teamcode.actions.ContinuousLiftAction;
 import org.firstinspires.ftc.teamcode.actions.UpdateLiftAction;
-import org.firstinspires.ftc.teamcode.cv.CVUtil;
 import org.firstinspires.ftc.teamcode.cv.IsOrange;
-import org.firstinspires.ftc.teamcode.cv.IsPink;
-import org.firstinspires.ftc.teamcode.cv.IsPurple;
+import org.firstinspires.ftc.teamcode.cv.IsBlue;
+import org.firstinspires.ftc.teamcode.cv.IsGreen;
 
 @Autonomous
 public class CPUTestAuton extends LinearOpMode {
@@ -34,21 +31,20 @@ public class CPUTestAuton extends LinearOpMode {
 
         HardwareManager manager = new HardwareManager(config, hardwareMap);
 
-        ComputerVision.initializeCV(manager);
-
         while (!ComputerVision.initialized)
         {}
 
-        CVUtil.getMat();
+        ComputerVision.startStream();
+
+        while (!ComputerVision.streaming)
+        {}
 
         Pipeline pinkPipeline = new Pipeline.Builder(manager).build();
 
         Pipeline pipeline = new Pipeline.Builder(manager)
-                .addAction(new ContinuousLiftAction(manager))
-                .addAction(new UpdateLiftAction(manager, 1000))
-                .evaluateBool(new IsPink(), pinkPipeline)
+                .evaluateBool(new IsBlue(), pinkPipeline)
                 .evaluateBool(new IsOrange(), pinkPipeline)
-                .evaluateBool(new IsPurple(), pinkPipeline)
+                .evaluateBool(new IsGreen(), pinkPipeline)
                 .build();
 
         waitForStart();

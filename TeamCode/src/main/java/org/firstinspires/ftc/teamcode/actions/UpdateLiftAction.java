@@ -13,6 +13,7 @@ public class UpdateLiftAction extends Action {
 
     @Override
     public void execute() {
-        ContinuousLiftAction.liftTarget = target;
+
+        ContinuousLiftAction.targetLiftPos = target;
     }
 }

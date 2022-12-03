@@ -27,8 +27,6 @@ public class CPULoop extends UserDriveLoop {
         DcMotorEx claw = hardware.accessoryMotors[1];
         Gamepad gp1 = hardware.opMode.gamepad1;
 
-
-
         double liftPower;
         if (gp1.right_trigger > 0.5 && (Math.abs(lift.getCurrentPosition()) < 12300 || gp1.dpad_left)) {
             liftPower = -1;
@@ -59,11 +57,11 @@ public class CPULoop extends UserDriveLoop {
 
             if (!isClawClosed)
             {
-                double time = System.currentTimeMillis() + 550;
+                double time = System.currentTimeMillis() + 300;
                 double currentTime = System.currentTimeMillis();
                 while (currentTime < time)
                 {
-                    claw.setPower(0.3);
+                    claw.setPower(0.4);
                     currentTime = System.currentTimeMillis();
                 }
 

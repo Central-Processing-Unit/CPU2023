@@ -18,10 +18,9 @@ public class CPUTeleop extends LinearOpMode {
                 .addAccessory(new Accessory(AccessoryType.MOTOR, "l0"))
                 .addAccessory(new Accessory(AccessoryType.MOTOR, "c0"))
                 .setIMU("imu")
-                .setTeleopValues(1, .6)
+                .setTeleopValues(.7, .5)
 //                .addAccessory(new Accessory(AccessoryType.WEBCAM, "webcam"))
                 .setOpMode(this)
-                .useCV()
                 .setIMUOffset(-Math.PI)
                 .build();
 
@@ -31,6 +30,7 @@ public class CPUTeleop extends LinearOpMode {
                 .bindActionToButton(Drive.Builder.GamepadButtons.A, new SampleIMUAction(manager), 1, true)
                 .addUserLoop(new CPULoop(manager, this))
                 .Build();
+
 
         waitForStart();
         drive.runDriveLoop();
