@@ -8,6 +8,7 @@ import com.chsrobotics.ftccore.hardware.config.accessory.AccessoryType;
 import com.chsrobotics.ftccore.teleop.Drive;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @TeleOp
 public class CPUTeleop extends LinearOpMode {
@@ -18,18 +19,18 @@ public class CPUTeleop extends LinearOpMode {
                 .addAccessory(new Accessory(AccessoryType.MOTOR, "l0"))
                 .addAccessory(new Accessory(AccessoryType.MOTOR, "c0"))
                 .setIMU("imu")
-                .setTeleopValues(.7, .5)
+                .setTeleopValues(.73, .5)
 //                .addAccessory(new Accessory(AccessoryType.WEBCAM, "webcam"))
                 .setOpMode(this)
-                .setIMUOffset(-Math.PI)
                 .build();
 
         HardwareManager manager = new HardwareManager(config, hardwareMap);
 
+        manager.accessoryMotors[1].setDirection(DcMotorSimple.Direction.REVERSE);
+
         Drive drive = new Drive.Builder(manager)
-                .bindActionToButton(Drive.Builder.GamepadButtons.A, new SampleIMUAction(manager), 1, true)
                 .addUserLoop(new CPULoop(manager, this))
-                .Build();
+                .build();
 
 
         waitForStart();

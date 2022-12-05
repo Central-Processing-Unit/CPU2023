@@ -11,9 +11,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.actions.ContinuousLiftAction;
 import org.firstinspires.ftc.teamcode.actions.UpdateLiftAction;
-import org.firstinspires.ftc.teamcode.cv.IsOrange;
-import org.firstinspires.ftc.teamcode.cv.IsBlue;
-import org.firstinspires.ftc.teamcode.cv.IsGreen;
 
 @Autonomous
 public class CPUTestAuton extends LinearOpMode {
@@ -42,9 +39,6 @@ public class CPUTestAuton extends LinearOpMode {
         Pipeline pinkPipeline = new Pipeline.Builder(manager).build();
 
         Pipeline pipeline = new Pipeline.Builder(manager)
-                .evaluateBool(new IsBlue(), pinkPipeline)
-                .evaluateBool(new IsOrange(), pinkPipeline)
-                .evaluateBool(new IsGreen(), pinkPipeline)
                 .build();
 
         waitForStart();

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.ZYX;
+
 import com.chsrobotics.ftccore.engine.navigation.control.PID;
 import com.chsrobotics.ftccore.hardware.HardwareManager;
 import com.chsrobotics.ftccore.teleop.UserDriveLoop;
@@ -8,12 +10,17 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+
 public class CPULoop extends UserDriveLoop {
 
     private final PID liftController = new PID(new PIDCoefficients(0.003, 0, 0));
+    private final PID clawController = new PID(new PIDCoefficients(0.0055, 0, 0));
     private double liftTarget;
+    private double clawTarget = 2;
     private long bLastPressed = -1;
-    private boolean isClawClosed = false;
+    private boolean isClawClosed = true;
 
 
     public CPULoop(HardwareManager manager, OpMode mode) {
@@ -26,12 +33,13 @@ public class CPULoop extends UserDriveLoop {
         DcMotorEx lift = hardware.accessoryMotors[0];
         DcMotorEx claw = hardware.accessoryMotors[1];
         Gamepad gp1 = hardware.opMode.gamepad1;
+        Gamepad gp2 = hardware.opMode.gamepad2;
 
         double liftPower;
-        if (gp1.right_trigger > 0.5 && (Math.abs(lift.getCurrentPosition()) < 12300 || gp1.dpad_left)) {
+        if ((gp1.right_trigger > 0.5 || gp2.right_trigger > 0.5) && (Math.abs(lift.getCurrentPosition()) < 10800 || gp1.dpad_left)) {
             liftPower = -1;
             liftTarget = lift.getCurrentPosition();
-        } else if (gp1.left_trigger > 0.5 && (Math.abs(lift.getCurrentPosition()) > 0 || gp1.dpad_left)){
+        } else if ((gp1.left_trigger > 0.5 || gp2.left_trigger > 0.5) && (-lift.getCurrentPosition() > 0 || gp1.dpad_left)){
             liftPower = 1;
             liftTarget = lift.getCurrentPosition();
         } else {
@@ -42,31 +50,28 @@ public class CPULoop extends UserDriveLoop {
         opmode.telemetry.addData("Loop Running", "True");
         opmode.telemetry.addData("Claw Closed", isClawClosed? "True" : "False");
         opmode.telemetry.addData("Claw Power", claw.getPower());
+        opmode.telemetry.addData("Slide", hardware.accessoryMotors[0].getCurrentPosition());
+        opmode.telemetry.addData("Claw Ticks", hardware.accessoryMotors[1].getCurrentPosition());
         opmode.telemetry.update();
 
 
         lift.setPower(liftPower);
 
         if (isClawClosed){
-            claw.setPower(-0.3);
+            clawTarget = 5;
+        } else
+            clawTarget = 56;
+
+        hardware.accessoryMotors[1].setPower(clawController.getOutput(clawTarget - claw.getCurrentPosition(), 0));
+
+        if (gp1.a)
+        {
+            hardware.IMUReset = hardware.imu.getAngularOrientation(AxesReference.INTRINSIC, ZYX, AngleUnit.RADIANS ).firstAngle;
         }
 
-        if (gp1.b && System.currentTimeMillis() - bLastPressed > 250) {
+        if ((gp1.b || gp2.b) && System.currentTimeMillis() - bLastPressed > 250) {
             bLastPressed = System.currentTimeMillis();
             isClawClosed = !isClawClosed;
-
-            if (!isClawClosed)
-            {
-                double time = System.currentTimeMillis() + 300;
-                double currentTime = System.currentTimeMillis();
-                while (currentTime < time)
-                {
-                    claw.setPower(0.4);
-                    currentTime = System.currentTimeMillis();
-                }
-
-                claw.setPower(0);
-            }
         }
     }
 }

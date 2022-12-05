@@ -10,6 +10,7 @@ import com.chsrobotics.ftccore.utilities.ComputerVision;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
 
 import org.firstinspires.ftc.teamcode.actions.ClawAction;
@@ -29,19 +30,16 @@ public class CPUNorthBlue extends LinearOpMode {
                 .setIMU("imu")
 //                .addAccessory(new Accessory(AccessoryType.WEBCAM, "webcam"))
                 .setOpMode(this)
-                .setPIDCoefficients(new PIDCoefficients(3.3, 0.001,0 ), new PIDCoefficients(100, 0.04, 0))
+                .setPIDCoefficients(new PIDCoefficients(3.3, 0.001,0 ), new PIDCoefficients(300, 0.01, 0))
                 //.useCV()
+                .setDebugMode(true)
                 .build();
 
         HardwareManager manager = new HardwareManager(config, hardwareMap);
 
+        manager.accessoryMotors[0].setDirection(DcMotorSimple.Direction.REVERSE);
+
         Pipeline pipeline = new Pipeline.Builder(manager)
-                .addContinuousAction(new ContinuousLiftAction(manager))
-                .addLinearPath(new Position(0, 300, 0))
-                .addAction(new ClawAction(manager))
-                .addLinearPath(new Position(80, 370, Math.PI / 4))
-                .addAction(new WaitLiftAction(manager))
-                .addLinearPath(new Position(0, 300, 0))
                 .build();
 
         waitForStart();
