@@ -18,6 +18,7 @@ public class CPULoop extends UserDriveLoop {
     private final PID liftController = new PID(new PIDCoefficients(0.003, 0, 0));
     private final PID clawController = new PID(new PIDCoefficients(0.0055, 0, 0));
     private double liftTarget;
+    private double liftLimit = 11200;
     private double clawTarget = 2;
     private long bLastPressed = -1;
     private boolean isClawClosed = true;
@@ -35,8 +36,15 @@ public class CPULoop extends UserDriveLoop {
         Gamepad gp1 = hardware.opMode.gamepad1;
         Gamepad gp2 = hardware.opMode.gamepad2;
 
+        if (gp2.dpad_left)
+            liftLimit = 11200;
+        else if (gp2.dpad_down)
+            liftLimit = 6500;
+        else if (gp2.dpad_right)
+            liftLimit = 4000;
+
         double liftPower;
-        if ((gp1.right_trigger > 0.1 || gp2.right_trigger > 0.1) && (Math.abs(lift.getCurrentPosition()) < 11200 || gp1.dpad_left)) {
+        if ((gp1.right_trigger > 0.1 || gp2.right_trigger > 0.1) && (Math.abs(lift.getCurrentPosition()) < liftLimit|| gp1.dpad_left)) {
             if (gp1.right_trigger > 0.1)
                 liftPower = -Math.pow(gp1.left_trigger, 2) - (0.5 * gp1.left_trigger);
             else
