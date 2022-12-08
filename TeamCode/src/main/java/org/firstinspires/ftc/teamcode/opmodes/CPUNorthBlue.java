@@ -6,7 +6,6 @@ import com.chsrobotics.ftccore.hardware.config.Config;
 import com.chsrobotics.ftccore.hardware.config.accessory.Accessory;
 import com.chsrobotics.ftccore.hardware.config.accessory.AccessoryType;
 import com.chsrobotics.ftccore.pipeline.Pipeline;
-import com.chsrobotics.ftccore.utilities.ComputerVision;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
