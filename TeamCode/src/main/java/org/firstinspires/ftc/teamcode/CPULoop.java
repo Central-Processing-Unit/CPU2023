@@ -30,7 +30,7 @@ public class CPULoop extends UserDriveLoop {
 
     public double getLiftSpeed(double input)
     {
-        return ((1/2d) * (Math.sin((input * Math.PI) - (Math.PI / 2d)))) + (1/2d);
+        return (Math.sin((input * (Math.PI/2)) - (Math.PI / 2d))) + 1;
     }
 
     @Override
