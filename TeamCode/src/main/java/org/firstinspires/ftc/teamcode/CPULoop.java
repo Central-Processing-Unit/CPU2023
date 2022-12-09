@@ -37,23 +37,23 @@ public class CPULoop extends UserDriveLoop {
         Gamepad gp2 = hardware.opMode.gamepad2;
 
         if (gp2.dpad_left)
-            liftLimit = 11200;
+            liftLimit = 4100;
         else if (gp2.dpad_down)
-            liftLimit = 6500;
+            liftLimit = 2000;
         else if (gp2.dpad_right)
-            liftLimit = 4000;
+            liftLimit = 1000;
 
-        double liftPower;
+        double liftPower = 0;
         if ((gp1.right_trigger > 0.1 || gp2.right_trigger > 0.1) && (Math.abs(lift.getCurrentPosition()) < liftLimit|| gp1.dpad_left)) {
             if (gp1.right_trigger > 0.1)
-                liftPower = -Math.pow(gp1.left_trigger, 2) - (0.5 * gp1.left_trigger);
-            else
-                liftPower = -Math.pow(gp2.left_trigger, 2) - (0.5 * gp2.left_trigger);
+                liftPower = -(Math.pow(gp1.right_trigger, 2) + (0.5 * gp1.right_trigger));
+            else if (gp2.right_trigger > 0.1)
+                liftPower = -(Math.pow(gp2.right_trigger, 2) + (0.5 * gp2.right_trigger));
             liftTarget = lift.getCurrentPosition();
         } else if ((gp1.left_trigger > 0.1 || gp2.left_trigger > 0.1) && (-lift.getCurrentPosition() > 0 || gp1.dpad_left)){
             if (gp1.left_trigger > 0.1)
                 liftPower = Math.pow(gp1.left_trigger, 2) + (0.5 * gp1.left_trigger);
-            else
+            else if (gp2.left_trigger > 0.1)
                 liftPower = Math.pow(gp2.left_trigger, 2) + (0.5 * gp2.left_trigger);
             liftTarget = lift.getCurrentPosition();
         } else {
@@ -64,6 +64,7 @@ public class CPULoop extends UserDriveLoop {
         opmode.telemetry.addData("Loop Running", "True");
         opmode.telemetry.addData("Claw Closed", isClawClosed? "True" : "False");
         opmode.telemetry.addData("Claw Power", claw.getPower());
+        opmode.telemetry.addData("Lift Power", liftPower);
         opmode.telemetry.addData("Slide", hardware.accessoryMotors[0].getCurrentPosition());
         opmode.telemetry.addData("Claw Ticks", hardware.accessoryMotors[1].getCurrentPosition());
         opmode.telemetry.update();

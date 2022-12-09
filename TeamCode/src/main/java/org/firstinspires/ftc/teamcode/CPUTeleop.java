@@ -32,6 +32,7 @@ public class CPUTeleop extends LinearOpMode {
                 .addUserLoop(new CPULoop(manager, this))
                 .build();
 
+        manager.accessoryMotors[1].setPower(0.1);
 
         waitForStart();
         drive.runDriveLoop();
