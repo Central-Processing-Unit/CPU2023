@@ -28,6 +28,11 @@ public class CPULoop extends UserDriveLoop {
         super(manager, mode);
     }
 
+    public double getLiftSpeed(double input)
+    {
+        return ((1/2d) * (Math.sin((input * Math.PI) - (Math.PI / 2d)))) + (1/2d);
+    }
+
     @Override
     public void loop() {
         HardwareManager hardware = this.hardware;
@@ -44,17 +49,17 @@ public class CPULoop extends UserDriveLoop {
             liftLimit = 1000;
 
         double liftPower = 0;
-        if ((gp1.right_trigger > 0.1 || gp2.right_trigger > 0.1) && (Math.abs(lift.getCurrentPosition()) < liftLimit|| gp1.dpad_left)) {
-            if (gp1.right_trigger > 0.1)
-                liftPower = -(Math.pow(gp1.right_trigger, 2) + (0.5 * gp1.right_trigger));
-            else if (gp2.right_trigger > 0.1)
-                liftPower = -(Math.pow(gp2.right_trigger, 2) + (0.5 * gp2.right_trigger));
+        if ((gp1.right_trigger > 0.01 || gp2.right_trigger > 0.01) && (Math.abs(lift.getCurrentPosition()) < liftLimit|| gp1.dpad_left)) {
+            if (gp1.right_trigger > 0.01)
+                liftPower = -getLiftSpeed(gp1.right_trigger);
+            else if (gp2.right_trigger > 0.01)
+                liftPower = -getLiftSpeed(gp2.right_trigger);
             liftTarget = lift.getCurrentPosition();
-        } else if ((gp1.left_trigger > 0.1 || gp2.left_trigger > 0.1) && (-lift.getCurrentPosition() > 0 || gp1.dpad_left)){
-            if (gp1.left_trigger > 0.1)
-                liftPower = Math.pow(gp1.left_trigger, 2) + (0.5 * gp1.left_trigger);
-            else if (gp2.left_trigger > 0.1)
-                liftPower = Math.pow(gp2.left_trigger, 2) + (0.5 * gp2.left_trigger);
+        } else if ((gp1.left_trigger > 0.01 || gp2.left_trigger > 0.01) && (-lift.getCurrentPosition() > 0 || gp1.dpad_left)){
+            if (gp1.left_trigger > 0.01)
+                liftPower = getLiftSpeed(gp1.left_trigger);
+            else if (gp2.left_trigger > 0.01)
+                liftPower = getLiftSpeed(gp2.left_trigger);
             liftTarget = lift.getCurrentPosition();
         } else {
             liftPower = liftController.getOutput(liftTarget - lift.getCurrentPosition(), 0);
