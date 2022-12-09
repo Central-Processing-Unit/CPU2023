@@ -12,7 +12,6 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
 
-import org.firstinspires.ftc.teamcode.actions.ClawAction;
 import org.firstinspires.ftc.teamcode.actions.ContinuousLiftAction;
 import org.firstinspires.ftc.teamcode.actions.UpdateLiftAction;
 import org.firstinspires.ftc.teamcode.actions.WaitLiftAction;
