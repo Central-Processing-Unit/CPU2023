@@ -7,14 +7,22 @@ import com.qualcomm.robotcore.hardware.PIDCoefficients;
 
 public class ContinuousClawAction extends ContinuousAction {
     public ContinuousClawAction(HardwareManager hardware) {
+
         super(hardware);
+        manager = hardware;
     }
-    private final PID clawController = new PID(new PIDCoefficients(0.0055, 0, 0));
-    public static double clawTarget = 2;
+    private static final PID clawController = new PID(new PIDCoefficients(0.0055, 0, 0));
+    public static double clawTarget = 56;
+    public static HardwareManager manager;
 
     @Override
     public void execute() {
-        hardware.accessoryMotors[1].setPower(clawController.getOutput(clawTarget - hardware.accessoryMotors[1].getCurrentPosition(), 0));
+        manager.accessoryMotors[1].setPower(clawController.getOutput(clawTarget - (manager.accessoryMotors[1].getCurrentPosition() - 10), 0));
+    }
+
+    public static void manualClaw()
+    {
+        manager.accessoryMotors[1].setPower(clawController.getOutput(clawTarget - (manager.accessoryMotors[1].getCurrentPosition() - 10), 0));
     }
 
     @Override

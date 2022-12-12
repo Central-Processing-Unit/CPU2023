@@ -19,9 +19,9 @@ public class CPULoop extends UserDriveLoop {
     private final PID clawController = new PID(new PIDCoefficients(0.0055, 0, 0));
     private double liftTarget;
     private double liftLimit = 11200;
-    private double clawTarget = 2;
+    private double clawTarget = 56;
     private long bLastPressed = -1;
-    private boolean isClawClosed = true;
+    private boolean isClawClosed = false;
 
 
     public CPULoop(HardwareManager manager, OpMode mode) {
@@ -82,7 +82,7 @@ public class CPULoop extends UserDriveLoop {
         } else
             clawTarget = 56;
 
-        hardware.accessoryMotors[1].setPower(clawController.getOutput(clawTarget - claw.getCurrentPosition(), 0));
+        hardware.accessoryMotors[1].setPower(clawController.getOutput(clawTarget - (claw.getCurrentPosition() - 16), 0));
 
         if (gp1.a)
         {
