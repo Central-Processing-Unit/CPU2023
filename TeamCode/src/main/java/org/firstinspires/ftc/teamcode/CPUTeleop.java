@@ -18,7 +18,7 @@ public class CPUTeleop extends LinearOpMode {
         Config config = new Config.Builder()
                 .setDriveMotors("m0", "m1", "m2", "m3")
                 .addAccessory(new Accessory(AccessoryType.MOTOR, "l0"))
-                .addAccessory(new Accessory(AccessoryType.MOTOR, "c0"))
+                //.addAccessory(new Accessory(AccessoryType.MOTOR, "c0"))
                 .setIMU("imu")
                 .setTeleopValues(1, .6)
                 .setMotorDirection(DcMotorSimple.Direction.FORWARD)

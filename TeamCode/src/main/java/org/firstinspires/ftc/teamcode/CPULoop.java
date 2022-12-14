@@ -15,11 +15,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
 public class CPULoop extends UserDriveLoop {
 
-    private final PID liftController = new PID(new PIDCoefficients(0.003, 0, 0));
-    private final PID clawController = new PID(new PIDCoefficients(0.0055, 0, 0));
-    private double liftTarget;
+    private final PID liftController = new PID(new PIDCoefficients(0.003, 0, 0));private double liftTarget;
     private double liftLimit = 11200;
-    private double clawTarget = 56;
     private long bLastPressed = -1;
     private boolean isClawClosed = false;
 
@@ -77,13 +74,6 @@ public class CPULoop extends UserDriveLoop {
 
         lift.setPower(liftPower);
 
-        if (isClawClosed){
-            clawTarget = 5;
-        } else
-            clawTarget = 56;
-
-        hardware.accessoryMotors[1].setPower(clawController.getOutput(clawTarget - (claw.getCurrentPosition() - 16), 0));
-
         if (gp1.a)
         {
             hardware.IMUReset = hardware.imu.getAngularOrientation(AxesReference.INTRINSIC, ZYX, AngleUnit.RADIANS ).firstAngle;
@@ -92,6 +82,14 @@ public class CPULoop extends UserDriveLoop {
         if ((gp1.b || gp2.b) && System.currentTimeMillis() - bLastPressed > 250) {
             bLastPressed = System.currentTimeMillis();
             isClawClosed = !isClawClosed;
+
+            if (isClawClosed){
+                hardware.accessoryServos[0].setPosition(0.3);
+                hardware.accessoryServos[0].setPosition(0.3);
+            } else {
+                hardware.accessoryServos[0].setPosition(0);
+                hardware.accessoryServos[0].setPosition(0.3);
+            }
         }
     }
 }

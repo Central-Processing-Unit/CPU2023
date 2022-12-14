@@ -13,12 +13,9 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
-
-import org.firstinspires.ftc.teamcode.actions.ContinuousClawAction;
 import org.firstinspires.ftc.teamcode.actions.ContinuousLiftAction;
-import org.firstinspires.ftc.teamcode.actions.UpdateClawAction;
+import org.firstinspires.ftc.teamcode.actions.SetClawAction;
 import org.firstinspires.ftc.teamcode.actions.UpdateLiftAction;
-import org.firstinspires.ftc.teamcode.actions.WaitClawAction;
 import org.firstinspires.ftc.teamcode.actions.WaitLiftAction;
 
 @Autonomous
@@ -52,9 +49,7 @@ public class CPUSouthBlue extends LinearOpMode {
 
         Pipeline pipeline = new Pipeline.Builder(manager)
                 .addContinuousAction(new ContinuousLiftAction(manager))
-                .addContinuousAction(new ContinuousClawAction(manager))
-                .addAction(new UpdateClawAction(manager, true))
-                .addAction(new WaitClawAction(manager))
+                .addAction(new SetClawAction(manager, true))
                 .addLinearPath(false,
                         new Position(0, 1346, Math.PI/2),
                         new Position(0, 1169, Math.PI/2))
@@ -62,25 +57,20 @@ public class CPUSouthBlue extends LinearOpMode {
                 .addAction(new WaitLiftAction(manager))
                 .addLinearPath(false,
                         new Position(-100, 1169, Math.PI/2))
-                .addAction(new UpdateClawAction(manager, false))
-                .addAction(new WaitClawAction(manager))
-                .addAction(new UpdateClawAction(manager, true))
-                .addAction(new WaitClawAction(manager))
+                .addAction(new SetClawAction(manager, false))
+                .addAction(new SetClawAction(manager, true))
                 .addAction(new UpdateLiftAction(manager, 50))
                 .addAction(new WaitLiftAction(manager))
                 .addLinearPath(false,
                         new Position(0, 1769, (3 * Math.PI) / 2),
                         new Position(800, 1769, (3 * Math.PI) / 2))
-                .addAction(new UpdateClawAction(manager, true))
-                .addAction(new WaitClawAction(manager))
+                .addAction(new SetClawAction(manager, true))
                 .addAction(new UpdateLiftAction(manager, 3000))
                 .addLinearPath(false,
                         new Position(0, 1769, Math.PI / 4))
                 .addAction(new WaitLiftAction(manager))
-                .addAction(new UpdateClawAction(manager, false))
-                .addAction(new WaitClawAction(manager))
-                .addAction(new UpdateClawAction(manager, true))
-                .addAction(new WaitClawAction(manager))
+                .addAction(new SetClawAction(manager, false))
+                .addAction(new SetClawAction(manager, true))
                 .build();
 
         MiscConstants.DISTANCE_PER_TICK *= 0.9;
