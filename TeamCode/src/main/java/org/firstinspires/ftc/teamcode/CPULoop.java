@@ -85,10 +85,10 @@ public class CPULoop extends UserDriveLoop {
 
             if (isClawClosed){
                 hardware.accessoryServos[0].setPosition(0.3);
-                hardware.accessoryServos[0].setPosition(0.3);
+                hardware.accessoryServos[1].setPosition(0.3);
             } else {
                 hardware.accessoryServos[0].setPosition(0);
-                hardware.accessoryServos[0].setPosition(0.3);
+                hardware.accessoryServos[1].setPosition(0.3);
             }
         }
     }

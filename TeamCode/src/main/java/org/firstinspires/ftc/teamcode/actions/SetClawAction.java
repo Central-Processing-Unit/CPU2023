@@ -15,10 +15,10 @@ public class SetClawAction extends Action {
     public void execute() {
         if (closed){
             hardware.accessoryServos[0].setPosition(0.3);
-            hardware.accessoryServos[0].setPosition(0.3);
+            hardware.accessoryServos[1].setPosition(0.3);
         } else {
             hardware.accessoryServos[0].setPosition(0);
-            hardware.accessoryServos[0].setPosition(0.3);
+            hardware.accessoryServos[1].setPosition(0.3);
         }
     }
 }
