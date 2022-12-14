@@ -34,7 +34,7 @@ public class CPULoop extends UserDriveLoop {
     public void loop() {
         HardwareManager hardware = this.hardware;
         DcMotorEx lift = hardware.accessoryMotors[0];
-        DcMotorEx claw = hardware.accessoryMotors[1];
+       // DcMotorEx claw = hardware.accessoryMotors[1];
         Gamepad gp1 = hardware.opMode.gamepad1;
         Gamepad gp2 = hardware.opMode.gamepad2;
 
@@ -65,10 +65,10 @@ public class CPULoop extends UserDriveLoop {
 
         opmode.telemetry.addData("Loop Running", "True");
         opmode.telemetry.addData("Claw Closed", isClawClosed? "True" : "False");
-        opmode.telemetry.addData("Claw Power", claw.getPower());
+        //opmode.telemetry.addData("Claw Power", claw.getPower());
         opmode.telemetry.addData("Lift Power", liftPower);
         opmode.telemetry.addData("Slide", hardware.accessoryMotors[0].getCurrentPosition());
-        opmode.telemetry.addData("Claw Ticks", hardware.accessoryMotors[1].getCurrentPosition());
+       // opmode.telemetry.addData("Claw Ticks", hardware.accessoryMotors[1].getCurrentPosition());
         opmode.telemetry.update();
 
 

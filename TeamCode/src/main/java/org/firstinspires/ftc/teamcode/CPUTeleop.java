@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp
 public class CPUTeleop extends LinearOpMode {
@@ -35,6 +36,10 @@ public class CPUTeleop extends LinearOpMode {
                 .addUserLoop(new CPULoop(manager, this))
                 .build();
 
+        manager.accessoryServos[0].setDirection(Servo.Direction.FORWARD);
+        manager.accessoryServos[1].setDirection(Servo.Direction.FORWARD);
+        manager.accessoryServos[0].setPosition(1);
+        manager.accessoryServos[0].setPosition(1);
         waitForStart();
 
         drive.runDriveLoop();
