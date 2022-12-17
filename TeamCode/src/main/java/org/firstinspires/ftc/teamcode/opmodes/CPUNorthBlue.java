@@ -13,10 +13,12 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.actions.ContinuousLiftAction;
 import org.firstinspires.ftc.teamcode.actions.SetClawAction;
 import org.firstinspires.ftc.teamcode.actions.UpdateLiftAction;
+import org.firstinspires.ftc.teamcode.actions.WaitAction;
 import org.firstinspires.ftc.teamcode.actions.WaitLiftAction;
 
 @Autonomous
@@ -28,54 +30,64 @@ public class CPUNorthBlue extends LinearOpMode {
                 .setDriveMotors("m0", "m1", "m2", "m3")
                 .addAccessory(new Accessory(AccessoryType.MOTOR, "l0"))
                 .addAccessory(new Accessory(AccessoryType.MOTOR, "c0"))
+                .addAccessory(new Accessory(AccessoryType.SERVO, "s0"))
+                .addAccessory(new Accessory(AccessoryType.SERVO, "s1"))
+
                 .setMotorDirection(DcMotorSimple.Direction.FORWARD)
                 .setIMU("imu")
 //                .addAccessory(new Accessory(AccessoryType.WEBCAM, "webcam"))
                 .setOpMode(this)
-                .setPIDCoefficients(new PIDCoefficients(3.5, 0.001,0 ), new PIDCoefficients(600, 0.04, 0))
+                .setPIDCoefficients(new PIDCoefficients(3.2, 0.001,0 ), new PIDCoefficients(550, 0.04, 0))
                 //.useCV()
                 .setDebugMode(true)
                 .build();
 
         HardwareManager manager = new HardwareManager(config, hardwareMap);
 
-        manager.accessoryMotors[1].setDirection(DcMotorSimple.Direction.REVERSE);
-
-        long time = System.currentTimeMillis() + 1000;
-
-        while (System.currentTimeMillis() < time)
-            manager.accessoryMotors[1].setPower(-0.2);
-
         manager.accessoryMotors[0].setDirection(DcMotorSimple.Direction.REVERSE);
+
+        manager.accessoryServos[0].setPosition(0.55);
+        manager.accessoryServos[1].setPosition(0.55);
+
+        manager.accessoryServos[0].setPosition(0.45);
+        manager.accessoryServos[1].setPosition(0.45);
 
         Pipeline pipeline = new Pipeline.Builder(manager)
                 .addContinuousAction(new ContinuousLiftAction(manager))
                 .addAction(new SetClawAction(manager, true))
                 .addLinearPath(false,
-                        new Position(0, 1346, Math.PI/2),
-                        new Position(0, 1169, Math.PI/2))
-                .addAction(new UpdateLiftAction(manager, 3000))
+                        new Position(0, 1846, 0),
+                        new Position(0, 1600, 3 * Math.PI/2))
+                .addAction(new UpdateLiftAction(manager, 4200))
                 .addAction(new WaitLiftAction(manager))
                 .addLinearPath(false,
-                        new Position(-100, 1169, Math.PI/2))
+                        new Position(100, 1660, 3 * Math.PI/2))
+                .addAction(new WaitAction(manager, 300))
                 .addAction(new SetClawAction(manager, false))
-                .addAction(new SetClawAction(manager, true))
-                .addAction(new UpdateLiftAction(manager, 50))
-                .addAction(new WaitLiftAction(manager))
+                .addLinearPath(true,
+                        new Position(0, 1569, 3 * Math.PI/2))
+                .addAction(new UpdateLiftAction(manager, 600))
                 .addLinearPath(false,
-                        new Position(0, 1769, (3 * Math.PI) / 2),
-                        new Position(800, 1769, (3 * Math.PI) / 2))
-                .addLinearPath(
-                        new Position(0, 1769, (3 * Math.PI) / 2),
-                        new Position(0, 1769, Math.PI / 4 ))
+                        new Position(0,1300, Math.PI/2),
+                        new Position(-650, 1360, Math.PI/2))
+                .addAction(new SetClawAction(manager, true))
+                .addAction(new WaitAction(manager, 500))
+                .addAction(new UpdateLiftAction(manager, 900))
+                .addAction(new WaitLiftAction(manager))
+                .addAction(new UpdateLiftAction(manager, 4200))
+                .addLinearPath(false,
+                        new Position(100, 1300, 3 * Math.PI/2),
+                        new Position(110, 1668, 3 * Math.PI/2))
+                .addAction(new SetClawAction(manager, false))
+                .addAction(new WaitAction(manager, 300))
+                .addAction(new UpdateLiftAction(manager, 200))
+                .addLinearPath(false,
+                        new Position(0, 1350, 0))
                 .build();
 
-        MiscConstants.DISTANCE_PER_TICK *= 0.9;
+        MiscConstants.DISTANCE_PER_TICK = 0.83 * 0.9;
 
         waitForStart();
-
-        manager.accessoryMotors[1].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        manager.accessoryMotors[1].setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         pipeline.execute();
     }

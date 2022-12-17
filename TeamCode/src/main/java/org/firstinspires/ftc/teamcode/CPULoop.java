@@ -46,13 +46,13 @@ public class CPULoop extends UserDriveLoop {
             liftLimit = 1000;
 
         double liftPower = 0;
-        if ((gp1.right_trigger > 0.01 || gp2.right_trigger > 0.01) && (Math.abs(lift.getCurrentPosition()) < liftLimit|| gp1.dpad_left)) {
+        if ((gp1.right_trigger > 0.01 || gp2.right_trigger > 0.01) && (Math.abs(lift.getCurrentPosition()) < liftLimit  || gp1.dpad_left)) {
             if (gp1.right_trigger > 0.01)
                 liftPower = -getLiftSpeed(gp1.right_trigger);
             else if (gp2.right_trigger > 0.01)
                 liftPower = -getLiftSpeed(gp2.right_trigger);
             liftTarget = lift.getCurrentPosition();
-        } else if ((gp1.left_trigger > 0.01 || gp2.left_trigger > 0.01) && (-lift.getCurrentPosition() > 0 || gp1.dpad_left)){
+        } else if ((gp1.left_trigger > 0.01 || gp2.left_trigger > 0.01) && (lift.getCurrentPosition() < 0 || gp1.dpad_left)){
             if (gp1.left_trigger > 0.01)
                 liftPower = getLiftSpeed(gp1.left_trigger);
             else if (gp2.left_trigger > 0.01)
@@ -84,11 +84,11 @@ public class CPULoop extends UserDriveLoop {
             isClawClosed = !isClawClosed;
 
             if (isClawClosed){
-                hardware.accessoryServos[0].setPosition(0.3);
-                hardware.accessoryServos[1].setPosition(0.3);
+                hardware.accessoryServos[0].setPosition(0.495);
+                hardware.accessoryServos[1].setPosition(0.495);
             } else {
-                hardware.accessoryServos[0].setPosition(0);
-                hardware.accessoryServos[1].setPosition(0.3);
+                hardware.accessoryServos[0].setPosition(0.59);
+                hardware.accessoryServos[1].setPosition(0.41);
             }
         }
     }
