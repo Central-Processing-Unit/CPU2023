@@ -87,8 +87,8 @@ public class CPULoop extends UserDriveLoop {
                 hardware.accessoryServos[0].setPosition(0.495);
                 hardware.accessoryServos[1].setPosition(0.495);
             } else {
-                hardware.accessoryServos[0].setPosition(0.59);
-                hardware.accessoryServos[1].setPosition(0.41);
+                hardware.accessoryServos[0].setPosition(0.63);
+                hardware.accessoryServos[1].setPosition(0.32);
             }
         }
     }
