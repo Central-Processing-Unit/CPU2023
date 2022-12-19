@@ -36,6 +36,12 @@ public class CPUTeleop extends LinearOpMode {
                 .addUserLoop(new CPULoop(manager, this))
                 .build();
 
+        manager.driveMotors[0].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        manager.driveMotors[1].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        manager.driveMotors[2].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        manager.driveMotors[3].setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
+
         manager.accessoryServos[0].setPosition(0.55);
         manager.accessoryServos[1].setPosition(0.4);
         waitForStart();
