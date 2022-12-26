@@ -53,8 +53,6 @@ public class CPUSouthRed extends LinearOpMode {
         manager.accessoryServos[0].setPosition(0.45);
         manager.accessoryServos[1].setPosition(0.45);
 
-        MiscConstants.DISTANCE_PER_TICK = 0.83 * 0.9;
-
 //        CVUtility cv = null;
 //        try {
 //            cv = new CVUtility(manager, telemetry);

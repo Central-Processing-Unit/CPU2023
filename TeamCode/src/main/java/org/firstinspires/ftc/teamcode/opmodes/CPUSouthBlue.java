@@ -84,7 +84,6 @@ public class CPUSouthBlue extends LinearOpMode {
                         new Position(0, 1350, 0))
                 .build();
 
-        MiscConstants.DISTANCE_PER_TICK = 0.83 * 0.9;
 
         waitForStart();
 

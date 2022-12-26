@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.auto.util;
+package org.firstinspires.ftc.teamcode.util;
 
 import android.graphics.Path;
 

@@ -18,7 +18,7 @@ public class CPUTeleop extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         Config config = new Config.Builder()
                 .setDriveMotors("m0", "m1", "m2", "m3")
-                .addAccessory(new Accessory(AccessoryType.MOTOR, "l0"))
+                //.addAccessory(new Accessory(AccessoryType.MOTOR, "l0"))
                 //.addAccessory(new Accessory(AccessoryType.MOTOR, "c0"))
                 .setIMU("imu")
                 .setTeleopValues(1, .6)
@@ -32,7 +32,7 @@ public class CPUTeleop extends LinearOpMode {
         HardwareManager manager = new HardwareManager(config, hardwareMap);
 
         Drive drive = new Drive.Builder(manager)
-                .useScale(Drive.Builder.ScaleMode.SIN_SCALE)
+                .useScale(Drive.Builder.ScaleMode.LINEAR)
                 .addUserLoop(new CPULoop(manager, this))
                 .build();
 

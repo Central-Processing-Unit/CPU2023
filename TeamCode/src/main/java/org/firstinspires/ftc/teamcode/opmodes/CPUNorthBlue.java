@@ -21,8 +21,10 @@ import org.firstinspires.ftc.teamcode.actions.SetClawAction;
 import org.firstinspires.ftc.teamcode.actions.UpdateLiftAction;
 import org.firstinspires.ftc.teamcode.actions.WaitAction;
 import org.firstinspires.ftc.teamcode.actions.WaitLiftAction;
+import org.firstinspires.ftc.teamcode.util.RobotConstants;
 
 @Autonomous
+@com.acmerobotics.dashboard.config.Config
 public class CPUNorthBlue extends LinearOpMode {
 
     @Override
@@ -31,32 +33,32 @@ public class CPUNorthBlue extends LinearOpMode {
 
         Config config = new Config.Builder()
                 .setDriveMotors("m0", "m1", "m2", "m3")
-                .addAccessory(new Accessory(AccessoryType.MOTOR, "l0"))
-                .addAccessory(new Accessory(AccessoryType.MOTOR, "c0"))
+                .setOdometryWheelProperties(537.7f, 96, 0, 0)
+//                .addAccessory(new Accessory(AccessoryType.MOTOR, "l0"))
+//                .addAccessory(new Accessory(AccessoryType.MOTOR, "c0"))
                 .addAccessory(new Accessory(AccessoryType.SERVO, "s0"))
                 .addAccessory(new Accessory(AccessoryType.SERVO, "s1"))
-                .addAccessory(new Accessory(AccessoryType.WEBCAM, "webcam"))
-
+                .setNavigationTolerances(10, 0.1)
+                .useDegrees(true)
+//                .addAccessory(new Accessory(AccessoryType.WEBCAM, "webcam"))
                 .setMotorDirection(DcMotorSimple.Direction.FORWARD)
                 .setIMU("imu")
-//                .addAccessory(new Accessory(AccessoryType.WEBCAM, "webcam"))
                 .setOpMode(this)
-                .setPIDCoefficients(new PIDCoefficients(3.2, 0.001,0 ), new PIDCoefficients(550, 0.04, 0))
+                .setPIDCoefficients(RobotConstants.linear, RobotConstants.rotation)
+                //.setPIDCoefficients(new PIDCoefficients(3.2, 0.001,0 ), new PIDCoefficients(550, 0.04, 0))
                 //.useCV()
-                .setDebugMode(true)
+                //.setDebugMode(true)
                 .build();
 
         HardwareManager manager = new HardwareManager(config, hardwareMap);
 
-        manager.accessoryMotors[0].setDirection(DcMotorSimple.Direction.REVERSE);
+        //manager.accessoryMotors[0].setDirection(DcMotorSimple.Direction.REVERSE);
 
-        manager.accessoryServos[0].setPosition(0.55);
-        manager.accessoryServos[1].setPosition(0.55);
-
-        manager.accessoryServos[0].setPosition(0.45);
-        manager.accessoryServos[1].setPosition(0.45);
-
-        MiscConstants.DISTANCE_PER_TICK = 0.83 * 0.9;
+//        manager.accessoryServos[0].setPosition(0.55);
+//        manager.accessoryServos[1].setPosition(0.55);
+//
+//        manager.accessoryServos[0].setPosition(0.45);
+//        manager.accessoryServos[1].setPosition(0.45);
 
 //        CVUtility cv = null;
 //        try {
@@ -67,52 +69,14 @@ public class CPUNorthBlue extends LinearOpMode {
 //        }
 
         Pipeline pipeline = new Pipeline.Builder(manager)
-                .addContinuousAction(new ContinuousLiftAction(manager))
-                .addAction(new SetClawAction(manager, true))
-                .addLinearPath(false,
-                        new Position(0, 1846, 0),
-                        new Position(0, 1640, 3 * Math.PI/2))
-                .addAction(new UpdateLiftAction(manager, 4200))
-                .addAction(new WaitLiftAction(manager))
-                .addLinearPath(false,
-                        new Position(130, 1620, 3 * Math.PI/2))
-                .addAction(new WaitAction(manager, 300))
-                .addAction(new SetClawAction(manager, false))
-                .addLinearPath(true,
-                        new Position(0, 1569, 3 * Math.PI/2))
-                .addAction(new UpdateLiftAction(manager, 640))
-                .addLinearPath(false,
-                        new Position(0,1300, Math.PI/2),
-                        new Position(-650, 1300, Math.PI/2))
-                .addAction(new SetClawAction(manager, true))
-                .addAction(new WaitAction(manager, 500))
-                .addAction(new UpdateLiftAction(manager, 960))
-                .addAction(new WaitLiftAction(manager))
-                .addAction(new UpdateLiftAction(manager, 4200))
-                .addLinearPath(false,
-                        new Position(130, 1300, 3 * Math.PI/2),
-                        new Position(130, 1620, 3 * Math.PI/2))
-                .addAction(new SetClawAction(manager, false))
-                .addAction(new WaitAction(manager, 300))
-                .addLinearPath(true, //ANOTHER CYCLE
-                        new Position(0, 1569, 3 * Math.PI/2))
-                .addAction(new UpdateLiftAction(manager, 500))
-                .addLinearPath(false,
-                        new Position(0,1300, Math.PI/2),
-                        new Position(-650, 1300, Math.PI/2))
-                .addAction(new SetClawAction(manager, true))
-                .addAction(new WaitAction(manager, 500))
-                .addAction(new UpdateLiftAction(manager, 960))
-                .addAction(new WaitLiftAction(manager))
-                .addAction(new UpdateLiftAction(manager, 4200))
-                .addLinearPath(false,
-                        new Position(130, 1300, 3 * Math.PI/2),
-                        new Position(130, 1620, 3 * Math.PI/2))
-                .addAction(new SetClawAction(manager, false))
-                .addAction(new WaitAction(manager, 300))
-                .addLinearPath(false,
-                        new Position(0, 1350, 0),
-                        new Position(parkingPos, 1350, 0))
+                .addLinearPath(
+                        new Position(0, 1120, 315),
+                        new Position(-580, 1000, 90),
+                        new Position(0, 1120, 315),
+                        new Position(-580, 1000, 90),
+                        new Position(0, 1120, 315)
+                        )
+
                 .build();
 
         waitForStart();
