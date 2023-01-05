@@ -40,9 +40,9 @@ public class CPUNorthBlue extends LinearOpMode {
                 .addAccessory(new Accessory(AccessoryType.MOTOR, "l0"))
                 .addAccessory(new Accessory(AccessoryType.SERVO, "s0"))
                 .addAccessory(new Accessory(AccessoryType.SERVO, "s1"))
-                .setNavigationTolerances(new Tolerances(8, 0.09))
-                .setHighPrecisionTolerances(new Tolerances(6, 0.09))
-                .setLowPrecisionTolerances(new Tolerances(20, 0.12))
+                .setNavigationTolerances(RobotConstants.mediumPrecision)
+                .setHighPrecisionTolerances(RobotConstants.highPrecision)
+                .setLowPrecisionTolerances(RobotConstants.lowPrecision)
                 .useDegrees(true)
                 .addAccessory(new Accessory(AccessoryType.WEBCAM, "webcam"))
                 .setMotorDirection(DcMotorSimple.Direction.FORWARD)
@@ -57,9 +57,6 @@ public class CPUNorthBlue extends LinearOpMode {
         HardwareManager manager = new HardwareManager(config, hardwareMap);
 
         manager.accessoryMotors[0].setDirection(DcMotorSimple.Direction.REVERSE);
-
-        manager.accessoryServos[0].setPosition(0.55);
-        manager.accessoryServos[1].setPosition(0.55);
 
         manager.accessoryServos[0].setPosition(0.45);
         manager.accessoryServos[1].setPosition(0.45);
