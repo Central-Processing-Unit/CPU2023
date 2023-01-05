@@ -89,7 +89,7 @@ public class CPUNorthBlue extends LinearOpMode {
                 .addAction(new SetClawAction(manager, true))
                 .addAction(new UpdateLiftAction(manager, 4200))
                 .addLinearPath(PrecisionMode.LOW, new TrapezoidalMotionProfile(600, 1000), false,
-                        new Position(-75, 1100, 315))
+                        new Position(0, 1100, 315, 3))
                 .addLinearPath(false, new Position(35, 1050, 315))
                 .addAction(new WaitLiftAction(manager))
                 .addAction(new SetClawAction(manager, false))
