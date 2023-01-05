@@ -35,7 +35,7 @@ public class CPULoop extends UserDriveLoop {
     @Override
     public void loop() {
         HardwareManager hardware = this.hardware;
-        //DcMotorEx lift = hardware.accessoryMotors[0];
+        DcMotorEx lift = hardware.accessoryMotors[0];
        // DcMotorEx claw = hardware.accessoryMotors[1];
         Gamepad gp1 = hardware.opMode.gamepad1;
         Gamepad gp2 = hardware.opMode.gamepad2;
@@ -47,23 +47,23 @@ public class CPULoop extends UserDriveLoop {
         else if (gp2.dpad_right)
             liftLimit = 1000;
 
-//        double liftPower = 0;
-//        if ((gp1.right_trigger > 0.01 || gp2.right_trigger > 0.01) && (Math.abs(lift.getCurrentPosition()) < liftLimit  || gp1.dpad_left)) {
-//            if (gp1.right_trigger > 0.01)
-//                liftPower = -getLiftSpeed(gp1.right_trigger);
-//            else if (gp2.right_trigger > 0.01)
-//                liftPower = -getLiftSpeed(gp2.right_trigger);
-//            liftTarget = lift.getCurrentPosition();
-//        } else if ((gp1.left_trigger > 0.01 || gp2.left_trigger > 0.01) && (lift.getCurrentPosition() < 0 || gp1.dpad_left)){
-//            if (gp1.left_trigger > 0.01)
-//                liftPower = getLiftSpeed(gp1.left_trigger);
-//            else if (gp2.left_trigger > 0.01)
-//                liftPower = getLiftSpeed(gp2.left_trigger);
-//            liftTarget = lift.getCurrentPosition();
-//        } else {
-//            liftPower = liftController.getOutput(liftTarget - lift.getCurrentPosition(), 0);
-//            // todo: lift motor goes slower in PID. solution: override PID when it's mildly far from it's target
-//        }
+        double liftPower = 0;
+        if ((gp1.right_trigger > 0.01 || gp2.right_trigger > 0.01) && (Math.abs(lift.getCurrentPosition()) < liftLimit  || gp1.dpad_left)) {
+            if (gp1.right_trigger > 0.01)
+                liftPower = -getLiftSpeed(gp1.right_trigger);
+            else if (gp2.right_trigger > 0.01)
+                liftPower = -getLiftSpeed(gp2.right_trigger);
+            liftTarget = lift.getCurrentPosition();
+        } else if ((gp1.left_trigger > 0.01 || gp2.left_trigger > 0.01) && (lift.getCurrentPosition() < 0 || gp1.dpad_left)){
+            if (gp1.left_trigger > 0.01)
+                liftPower = getLiftSpeed(gp1.left_trigger);
+            else if (gp2.left_trigger > 0.01)
+                liftPower = getLiftSpeed(gp2.left_trigger);
+            liftTarget = lift.getCurrentPosition();
+        } else {
+            liftPower = liftController.getOutput(liftTarget - lift.getCurrentPosition(), 0);
+            // todo: lift motor goes slower in PID. solution: override PID when it's mildly far from it's target
+        }
 
 
 
@@ -71,13 +71,13 @@ public class CPULoop extends UserDriveLoop {
         opmode.telemetry.addData("Claw Closed", isClawClosed? "True" : "False");
         opmode.telemetry.addData("theta", hardware.imu.getAngularOrientation(AxesReference.INTRINSIC, ZYX, AngleUnit.RADIANS ).firstAngle);
         //opmode.telemetry.addData("Claw Power", claw.getPower());
-        //opmode.telemetry.addData("Lift Power", liftPower);
-        //opmode.telemetry.addData("Slide", hardware.accessoryMotors[0].getCurrentPosition());
+        opmode.telemetry.addData("Lift Power", liftPower);
+        opmode.telemetry.addData("Slide", hardware.accessoryMotors[0].getCurrentPosition());
        // opmode.telemetry.addData("Claw Ticks", hardware.accessoryMotors[1].getCurrentPosition());
         opmode.telemetry.update();
 
 
-        //lift.setPower(liftPower);
+        lift.setPower(liftPower);
 
         if (gp1.a)
         {
