@@ -14,11 +14,11 @@ public class SetClawAction extends Action {
     @Override
     public void execute() {
         if (closed){
-            hardware.accessoryServos[0].setPosition(0.495);
-            hardware.accessoryServos[1].setPosition(0.495);
+            hardware.accessoryServos[0].setPosition(0.54);
+            hardware.accessoryServos[1].setPosition(0.46);
         } else {
-            hardware.accessoryServos[0].setPosition(0.59);
-            hardware.accessoryServos[1].setPosition(0.41);
+            hardware.accessoryServos[0].setPosition(0.63);
+            hardware.accessoryServos[1].setPosition(0.32);
         }
     }
 }

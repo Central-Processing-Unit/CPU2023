@@ -49,7 +49,6 @@ public class CPUNorthBlue extends LinearOpMode {
                 .setIMU("imu")
                 .setOpMode(this)
                 .setPIDCoefficients(RobotConstants.linear, RobotConstants.rotation)
-                .setMotionProfilePIDCoeffs(new PIDCoefficients(4.5, 0.0015, 0.21))
                 .useCV()
                 .setDebugMode(true)
                 .build();
@@ -87,16 +86,43 @@ public class CPUNorthBlue extends LinearOpMode {
         Pipeline pipeline = new Pipeline.Builder(manager)
                 .addContinuousAction(new ContinuousLiftAction(manager))
                 .addAction(new SetClawAction(manager, true))
-                .addAction(new UpdateLiftAction(manager, 4200))
+                .addAction(new UpdateLiftAction(manager, 4220))
                 .addLinearPath(PrecisionMode.LOW, new TrapezoidalMotionProfile(600, 1000), false,
-                        new Position(0, 1100, 315, 3))
-                .addLinearPath(false, new Position(35, 1050, 315))
+                        new Position(3, 1160, 270, 1.5))
                 .addAction(new WaitLiftAction(manager))
                 .addAction(new SetClawAction(manager, false))
                 .addAction(new WaitAction(manager, 300))
-                .addAction(new UpdateLiftAction(manager, 900))
-                .addLinearPath(false,
-                        new Position(-580, 1000, 90))
+                .addAction(new UpdateLiftAction(manager, 870))
+                .addLinearPath(PrecisionMode.LOW, new TrapezoidalMotionProfile(500, 900), false,
+                        new Position(-545, 935, 90))
+                .addAction(new SetClawAction(manager, true))
+                .addAction(new WaitAction(manager, 300))
+                .addAction(new UpdateLiftAction(manager, 1500))
+                .addAction(new WaitLiftAction(manager))
+                .addLinearPath(new TrapezoidalMotionProfile(700, 1500), false,
+                        new Position(-300, 935, 90))
+                .addAction(new UpdateLiftAction(manager, 4400))
+                .addLinearPath(PrecisionMode.LOW, new TrapezoidalMotionProfile(500, 1000), false,
+                        new Position(190, 1000, 0))
+                .addAction(new SetClawAction(manager, false))
+                .addAction(new WaitAction(manager, 300))
+                .addAction(new UpdateLiftAction(manager, 750))
+                .changePID(new PIDCoefficients(6.5, 0.0012, 0.21))
+                .addLinearPath(PrecisionMode.LOW,
+                        new Position(190, 935, 0))
+                .changePID(new PIDCoefficients(4.5, 0.0012, 0.21))
+                .addLinearPath(PrecisionMode.LOW, new TrapezoidalMotionProfile(500, 1000), false,
+                        new Position(-545, 935, 90, 1))
+                .addAction(new SetClawAction(manager, true))
+                .addAction(new WaitAction(manager, 300))
+                .addAction(new UpdateLiftAction(manager, 1500))
+                .addAction(new WaitLiftAction(manager))
+                .addLinearPath(new TrapezoidalMotionProfile(700, 1500), false,
+                        new Position(-300, 935, 90))
+                .addAction(new UpdateLiftAction(manager, 4400))
+                .addLinearPath(PrecisionMode.LOW, new TrapezoidalMotionProfile(500, 1000), false,
+                        new Position(200, 1000, 0))
+                .addAction(new SetClawAction(manager, false))
                 .addLinearPath()
                 .build();
 
