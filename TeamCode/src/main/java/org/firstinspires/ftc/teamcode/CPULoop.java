@@ -6,6 +6,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.chsrobotics.ftccore.engine.navigation.control.PID;
 import com.chsrobotics.ftccore.hardware.HardwareManager;
+import com.chsrobotics.ftccore.teleop.Drive;
 import com.chsrobotics.ftccore.teleop.UserDriveLoop;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -21,6 +22,7 @@ public class CPULoop extends UserDriveLoop {
     private double liftLimit = 11200;
     private long bLastPressed = -1;
     private boolean isClawClosed = false;
+    private boolean precisionMode = false;
 
 
     public CPULoop(HardwareManager manager, OpMode mode) {
@@ -79,9 +81,38 @@ public class CPULoop extends UserDriveLoop {
 
         lift.setPower(liftPower);
 
+        if (gp1.x)
+            precisionMode = !precisionMode;
+
+        if (precisionMode)
+        {
+            Drive.linearFactor = 0.5;
+            Drive.rotationFactor = 0.5;
+        } else
+        {
+            Drive.linearFactor = 1;
+            Drive.rotationFactor = 1;
+        }
+
         if (gp1.a)
         {
             hardware.IMUReset = hardware.imu.getAngularOrientation(AxesReference.INTRINSIC, ZYX, AngleUnit.RADIANS ).firstAngle;
+        }
+
+        if (gp1.right_bumper || gp1.left_bumper)
+        {
+            if (gp1.right_bumper)
+                isClawClosed = true;
+            else if (gp1.left_bumper)
+                isClawClosed = false;
+
+            if (isClawClosed){
+                hardware.accessoryServos[0].setPosition(0.54);
+                hardware.accessoryServos[1].setPosition(0.46);
+            } else {
+                hardware.accessoryServos[0].setPosition(0.63);
+                hardware.accessoryServos[1].setPosition(0.32);
+            }
         }
 
         if ((gp1.b || gp2.b) && System.currentTimeMillis() - bLastPressed > 250) {
