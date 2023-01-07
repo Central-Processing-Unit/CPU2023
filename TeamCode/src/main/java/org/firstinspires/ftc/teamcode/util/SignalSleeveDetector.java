@@ -3,7 +3,15 @@ package org.firstinspires.ftc.teamcode.util;
 import android.graphics.Path;
 
 import com.chsrobotics.ftccore.hardware.HardwareManager;
+import com.chsrobotics.ftccore.vision.CVUtility;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.vuforia.Vuforia;
 
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.teamcode.util.OpModeHolder;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -12,11 +20,83 @@ import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.tensorflow.lite.TensorFlowLite;
+
+import java.util.List;
 
 public class SignalSleeveDetector {
-//        int cameraMonitorViewId = OpModeHolder.opMode.hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", OpModeHolder.opMode.hardwareMap.appContext.getPackageName());
-//        OpenCvCamera cvCamera = OpenCvCameraFactory.getInstance().createWebcam(manager.getWebcam(), cameraMonitorViewId);
 
+    private static VuforiaLocalizer vuforia;
+    private static TFObjectDetector tfod;
+
+    public static void initializeTensorFlow(HardwareManager manager, Telemetry telem)
+    {
+        try {
+            VuforiaLocalizer.Parameters params = new VuforiaLocalizer.Parameters();
+
+            params.vuforiaLicenseKey = RobotConstants.vuforiaKey;
+            params.cameraName = manager.getWebcam();
+
+            vuforia = ClassFactory.getInstance().createVuforia(params);
+
+            TFObjectDetector.Parameters tfParams = new TFObjectDetector.Parameters();
+
+            tfParams.minResultConfidence = 0.6f;
+            tfParams.isModelTensorFlow2 = true;
+            tfParams.inputSize = 300;
+
+            tfod = ClassFactory.getInstance().createTFObjectDetector(tfParams, vuforia);
+
+            tfod.loadModelFromFile(RobotConstants.asset);
+        } catch (Exception e)
+        {
+            tfod = null;
+        }
+
+        if (tfod != null) {
+            tfod.activate();
+
+            tfod.setZoom(1.0, 16.0/9.0);
+
+            telem.addData("Ready to start.", "");
+            telem.update();
+        }
+    }
+
+    public static Zone detectZone()
+    {
+        if (tfod == null)
+            return Zone.ZONE_TWO;
+
+        List<Recognition> recognitions = tfod.getUpdatedRecognitions();
+
+        float confidence = 0;
+
+        Recognition zone = null;
+
+        for (Recognition recognition : recognitions)
+        {
+            if (zone == null)
+                zone = recognition;
+            else if (recognition.getConfidence() > zone.getConfidence())
+                zone = recognition;
+        }
+
+        if (zone == null)
+            return Zone.ZONE_TWO;
+
+        switch (zone.getLabel())
+        {
+            case "1":
+                return Zone.ZONE_ONE;
+            case "2":
+                return Zone.ZONE_TWO;
+            case "3":
+                return Zone.ZONE_THREE;
+            default:
+                return Zone.ZONE_TWO;
+        }
+    }
 
     public static int detectOrientation(Mat mat) {
         if (mat == null) {
@@ -50,6 +130,7 @@ public class SignalSleeveDetector {
         int threshold = 200;
         OpModeHolder.opMode.telemetry.addData("blueIndex", blueIndex);
         OpModeHolder.opMode.telemetry.addData("greenIndex", greenIndex);
+
 //        OpModeHolder.opMode.telemetry.update();
         if (greenIndex > threshold || blueIndex > threshold) {
             if (greenIndex > blueIndex) {
@@ -58,6 +139,13 @@ public class SignalSleeveDetector {
             return 3;
         }
         return 1;
+    }
+
+    public enum Zone
+    {
+        ZONE_ONE,
+        ZONE_TWO,
+        ZONE_THREE
     }
 
 }

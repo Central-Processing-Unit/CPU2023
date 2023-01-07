@@ -42,21 +42,14 @@ public class CPULoop extends UserDriveLoop {
         Gamepad gp1 = hardware.opMode.gamepad1;
         Gamepad gp2 = hardware.opMode.gamepad2;
 
-        if (gp2.dpad_left)
-            liftLimit = 4100;
-        else if (gp2.dpad_down)
-            liftLimit = 2000;
-        else if (gp2.dpad_right)
-            liftLimit = 1000;
-
         double liftPower = 0;
-        if ((gp1.right_trigger > 0.01 || gp2.right_trigger > 0.01) && (Math.abs(lift.getCurrentPosition()) < liftLimit  || gp1.dpad_left)) {
+        if ((gp1.right_trigger > 0.01 || gp2.right_trigger > 0.01)) {
             if (gp1.right_trigger > 0.01)
                 liftPower = -getLiftSpeed(gp1.right_trigger);
             else if (gp2.right_trigger > 0.01)
                 liftPower = -getLiftSpeed(gp2.right_trigger);
             liftTarget = lift.getCurrentPosition();
-        } else if ((gp1.left_trigger > 0.01 || gp2.left_trigger > 0.01) && (lift.getCurrentPosition() < 0 || gp1.dpad_left)){
+        } else if ((gp1.left_trigger > 0.01 || gp2.left_trigger > 0.01)){
             if (gp1.left_trigger > 0.01)
                 liftPower = getLiftSpeed(gp1.left_trigger);
             else if (gp2.left_trigger > 0.01)
@@ -99,23 +92,20 @@ public class CPULoop extends UserDriveLoop {
             hardware.IMUReset = hardware.imu.getAngularOrientation(AxesReference.INTRINSIC, ZYX, AngleUnit.RADIANS ).firstAngle;
         }
 
-        if (gp1.right_bumper || gp1.left_bumper)
-        {
-            if (gp1.right_bumper)
-                isClawClosed = true;
-            else if (gp1.left_bumper)
-                isClawClosed = false;
+//        if (gp1.right_bumper)
+//        {
+//            isClawClosed = !isClawClosed;
+//
+//            if (isClawClosed){
+//                hardware.accessoryServos[0].setPosition(0.54);
+//                hardware.accessoryServos[1].setPosition(0.46);
+//            } else {
+//                hardware.accessoryServos[0].setPosition(0.63);
+//                hardware.accessoryServos[1].setPosition(0.32);
+//            }
+//        }
 
-            if (isClawClosed){
-                hardware.accessoryServos[0].setPosition(0.54);
-                hardware.accessoryServos[1].setPosition(0.46);
-            } else {
-                hardware.accessoryServos[0].setPosition(0.63);
-                hardware.accessoryServos[1].setPosition(0.32);
-            }
-        }
-
-        if ((gp1.b || gp2.b) && System.currentTimeMillis() - bLastPressed > 250) {
+        if ((gp1.b || gp2.b || gp1.right_bumper) && System.currentTimeMillis() - bLastPressed > 250) {
             bLastPressed = System.currentTimeMillis();
             isClawClosed = !isClawClosed;
 

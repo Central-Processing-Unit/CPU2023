@@ -24,6 +24,7 @@ import org.firstinspires.ftc.teamcode.actions.SetClawAction;
 import org.firstinspires.ftc.teamcode.actions.UpdateLiftAction;
 import org.firstinspires.ftc.teamcode.actions.WaitAction;
 import org.firstinspires.ftc.teamcode.actions.WaitLiftAction;
+import org.firstinspires.ftc.teamcode.util.OpModeHolder;
 import org.firstinspires.ftc.teamcode.util.RobotConstants;
 
 @Autonomous
@@ -60,6 +61,8 @@ public class CPUNorthBlue extends LinearOpMode {
         manager.accessoryServos[0].setPosition(0.45);
         manager.accessoryServos[1].setPosition(0.45);
 
+        OpModeHolder.opMode = this;
+
         CVUtility cv = null;
         try {
             cv = new CVUtility(manager, telemetry);
@@ -80,49 +83,51 @@ public class CPUNorthBlue extends LinearOpMode {
             telemetry.addLine("Signal sleeve detection failed");
         }
 
-        parkingPos = dots == 1 ? -600 :
-                (dots == 2 ? 0 : 700);
+        parkingPos = dots == 1 ? 500 :
+                (dots == 2 ? 0 : -500);
 
         Pipeline pipeline = new Pipeline.Builder(manager)
                 .addContinuousAction(new ContinuousLiftAction(manager))
                 .addAction(new SetClawAction(manager, true))
                 .addAction(new UpdateLiftAction(manager, 4220))
                 .addLinearPath(PrecisionMode.LOW, new TrapezoidalMotionProfile(600, 1000), false,
-                        new Position(3, 1160, 270, 1.5))
+                        new Position(20, 1160, 270, 2))
                 .addAction(new WaitLiftAction(manager))
                 .addAction(new SetClawAction(manager, false))
                 .addAction(new WaitAction(manager, 300))
-                .addAction(new UpdateLiftAction(manager, 870))
+                .addAction(new UpdateLiftAction(manager, 830))
+                .addLinearPath(PrecisionMode.LOW, new TrapezoidalMotionProfile(600, 1000), false,
+                        new Position(0, 935, 90))
                 .addLinearPath(PrecisionMode.LOW, new TrapezoidalMotionProfile(500, 900), false,
-                        new Position(-545, 935, 90))
+                        new Position(-510, 915, 90, 1.3))
                 .addAction(new SetClawAction(manager, true))
                 .addAction(new WaitAction(manager, 300))
                 .addAction(new UpdateLiftAction(manager, 1500))
                 .addAction(new WaitLiftAction(manager))
-                .addLinearPath(new TrapezoidalMotionProfile(700, 1500), false,
-                        new Position(-300, 935, 90))
                 .addAction(new UpdateLiftAction(manager, 4400))
                 .addLinearPath(PrecisionMode.LOW, new TrapezoidalMotionProfile(500, 1000), false,
-                        new Position(190, 1000, 0))
+                        new Position(275, 1000, 0, 1))
                 .addAction(new SetClawAction(manager, false))
                 .addAction(new WaitAction(manager, 300))
-                .addAction(new UpdateLiftAction(manager, 750))
+                .addAction(new UpdateLiftAction(manager, 730))
                 .changePID(new PIDCoefficients(6.5, 0.0012, 0.21))
                 .addLinearPath(PrecisionMode.LOW,
-                        new Position(190, 935, 0))
+                        new Position(275, 910, 0))
                 .changePID(new PIDCoefficients(4.5, 0.0012, 0.21))
                 .addLinearPath(PrecisionMode.LOW, new TrapezoidalMotionProfile(500, 1000), false,
-                        new Position(-545, 935, 90, 1))
+                        new Position(-510, 915, 90, 1.3))
                 .addAction(new SetClawAction(manager, true))
                 .addAction(new WaitAction(manager, 300))
                 .addAction(new UpdateLiftAction(manager, 1500))
                 .addAction(new WaitLiftAction(manager))
-                .addLinearPath(new TrapezoidalMotionProfile(700, 1500), false,
-                        new Position(-300, 935, 90))
                 .addAction(new UpdateLiftAction(manager, 4400))
                 .addLinearPath(PrecisionMode.LOW, new TrapezoidalMotionProfile(500, 1000), false,
-                        new Position(200, 1000, 0))
+                        new Position(275, 1000, 0, 1))
                 .addAction(new SetClawAction(manager, false))
+                .addAction(new UpdateLiftAction(manager, 100))
+                .addLinearPath(new TrapezoidalMotionProfile(700, 1500), false,
+                        new Position(parkingPos, 920, 0))
+                .addAction(new WaitLiftAction(manager))
                 .addLinearPath()
                 .build();
 

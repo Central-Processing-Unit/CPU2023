@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
+import com.chsrobotics.ftccore.engine.navigation.path.PrecisionMode;
+import com.chsrobotics.ftccore.engine.navigation.path.TrapezoidalMotionProfile;
 import com.chsrobotics.ftccore.geometry.Position;
 import com.chsrobotics.ftccore.hardware.HardwareManager;
 import com.chsrobotics.ftccore.hardware.config.Config;
@@ -7,6 +9,7 @@ import com.chsrobotics.ftccore.hardware.config.accessory.Accessory;
 import com.chsrobotics.ftccore.hardware.config.accessory.AccessoryType;
 import com.chsrobotics.ftccore.management.constants.MiscConstants;
 import com.chsrobotics.ftccore.pipeline.Pipeline;
+import com.chsrobotics.ftccore.vision.CVUtility;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -19,25 +22,30 @@ import org.firstinspires.ftc.teamcode.actions.SetClawAction;
 import org.firstinspires.ftc.teamcode.actions.UpdateLiftAction;
 import org.firstinspires.ftc.teamcode.actions.WaitAction;
 import org.firstinspires.ftc.teamcode.actions.WaitLiftAction;
+import org.firstinspires.ftc.teamcode.util.RobotConstants;
 
 @Autonomous
 public class CPUNorthRed extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
+        int parkingPos = 0;
+
         Config config = new Config.Builder()
                 .setDriveMotors("m0", "m1", "m2", "m3")
+                .setOdometryWheelProperties(537.7f, 96, 0, 0)
                 .addAccessory(new Accessory(AccessoryType.MOTOR, "l0"))
-                .addAccessory(new Accessory(AccessoryType.MOTOR, "c0"))
                 .addAccessory(new Accessory(AccessoryType.SERVO, "s0"))
                 .addAccessory(new Accessory(AccessoryType.SERVO, "s1"))
+                .setNavigationTolerances(RobotConstants.mediumPrecision)
+                .setHighPrecisionTolerances(RobotConstants.highPrecision)
+                .setLowPrecisionTolerances(RobotConstants.lowPrecision)
+                .useDegrees(true)
                 .addAccessory(new Accessory(AccessoryType.WEBCAM, "webcam"))
-
                 .setMotorDirection(DcMotorSimple.Direction.FORWARD)
                 .setIMU("imu")
-//                .addAccessory(new Accessory(AccessoryType.WEBCAM, "webcam"))
                 .setOpMode(this)
-                .setPIDCoefficients(new PIDCoefficients(3.2, 0.001,0 ), new PIDCoefficients(550, 0.04, 0))
-                //.useCV()
+                .setPIDCoefficients(RobotConstants.linear, RobotConstants.rotation)
+                .useCV()
                 .setDebugMode(true)
                 .build();
 
@@ -45,47 +53,76 @@ public class CPUNorthRed extends LinearOpMode {
 
         manager.accessoryMotors[0].setDirection(DcMotorSimple.Direction.REVERSE);
 
-        manager.accessoryServos[0].setPosition(0.55);
-        manager.accessoryServos[1].setPosition(0.55);
-
         manager.accessoryServos[0].setPosition(0.45);
         manager.accessoryServos[1].setPosition(0.45);
+
+        CVUtility cv = null;
+        try {
+            cv = new CVUtility(manager, telemetry);
+        } catch (Exception e) {
+            telemetry.addLine("CVUtility failed to initialized");
+            telemetry.update();
+        }
+
+        waitForStart();
+
+        int dots = 1;
+        if (cv != null && cv.initialized && cv.grabFrame() != null) {
+            dots = org.firstinspires.ftc.teamcode.util.SignalSleeveDetector.detectOrientation(cv.grabFrame());
+
+            telemetry.addData("Dots: ", dots);
+            cv.stopStreaming();
+        } else {
+            telemetry.addLine("Signal sleeve detection failed");
+        }
+
+        parkingPos = dots == 1 ? 700:
+                (dots == 2 ? 0 : -600);
 
         Pipeline pipeline = new Pipeline.Builder(manager)
                 .addContinuousAction(new ContinuousLiftAction(manager))
                 .addAction(new SetClawAction(manager, true))
-                .addLinearPath(false,
-                        new Position(0, 1846, 0),
-                        new Position(0, 1640, Math.PI/2))
-                .addAction(new UpdateLiftAction(manager, 4200))
+                .addAction(new UpdateLiftAction(manager, 4220))
+                .addLinearPath(PrecisionMode.LOW, new TrapezoidalMotionProfile(600, 1000), false,
+                        new Position(-20, 1160, 90, 2))
                 .addAction(new WaitLiftAction(manager))
-                .addLinearPath(false,
-                        new Position(-130, 1620, Math.PI/2))
-                .addAction(new WaitAction(manager, 300))
                 .addAction(new SetClawAction(manager, false))
-                .addLinearPath(true,
-                        new Position(0, 1569, Math.PI/2))
-                .addAction(new UpdateLiftAction(manager, 600))
-                .addLinearPath(false,
-                        new Position(0,1300, 3 * Math.PI/2),
-                        new Position(675, 1300, 3* Math.PI/2))
+                .addAction(new WaitAction(manager, 300))
+                .addAction(new UpdateLiftAction(manager, 830))
+                .addLinearPath(PrecisionMode.LOW, new TrapezoidalMotionProfile(600, 1000), false,
+                        new Position(0, 935, 270))
+                .addLinearPath(PrecisionMode.LOW, new TrapezoidalMotionProfile(500, 900), false,
+                        new Position(580, 935, 270))
                 .addAction(new SetClawAction(manager, true))
-                .addAction(new WaitAction(manager, 500))
-                .addAction(new UpdateLiftAction(manager, 960))
+                .addAction(new WaitAction(manager, 300))
+                .addAction(new UpdateLiftAction(manager, 1500))
                 .addAction(new WaitLiftAction(manager))
-                .addAction(new UpdateLiftAction(manager, 4200))
-                .addLinearPath(false,
-                        new Position(-130, 1300, Math.PI/2),
-                        new Position(-130, 1620, Math.PI/2))
+                .addAction(new UpdateLiftAction(manager, 4400))
+                .addLinearPath(PrecisionMode.LOW, new TrapezoidalMotionProfile(500, 1000), false,
+                        new Position(-220, 1000, 0))
                 .addAction(new SetClawAction(manager, false))
                 .addAction(new WaitAction(manager, 300))
-                .addAction(new UpdateLiftAction(manager, 200))
-                .addLinearPath(false,
-                        new Position(0, 1350, 0))
+                .addAction(new UpdateLiftAction(manager, 730))
+                .changePID(new PIDCoefficients(6.5, 0.0012, 0.21))
+                .addLinearPath(PrecisionMode.LOW,
+                        new Position(-220, 910, 0))
+                .changePID(new PIDCoefficients(4.5, 0.0012, 0.21))
+                .addLinearPath(PrecisionMode.LOW, new TrapezoidalMotionProfile(500, 1000), false,
+                        new Position(575, 935, 270, 1.4))
+                .addAction(new SetClawAction(manager, true))
+                .addAction(new WaitAction(manager, 300))
+                .addAction(new UpdateLiftAction(manager, 1500))
+                .addAction(new WaitLiftAction(manager))
+                .addAction(new UpdateLiftAction(manager, 4400))
+                .addLinearPath(PrecisionMode.LOW, new TrapezoidalMotionProfile(500, 1000), false,
+                        new Position(-225, 1000, 0))
+                .addAction(new SetClawAction(manager, false))
+                .addAction(new UpdateLiftAction(manager, 100))
+                .addLinearPath(new TrapezoidalMotionProfile(700, 1500), false,
+                        new Position(parkingPos, 920, 0))
+                .addAction(new WaitLiftAction(manager))
+                .addLinearPath()
                 .build();
-
-
-        waitForStart();
 
         pipeline.execute();
     }
