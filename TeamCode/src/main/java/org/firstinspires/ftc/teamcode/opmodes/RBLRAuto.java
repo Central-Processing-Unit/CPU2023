@@ -8,6 +8,7 @@ import com.chsrobotics.ftccore.hardware.config.Config;
 import com.chsrobotics.ftccore.hardware.config.accessory.Accessory;
 import com.chsrobotics.ftccore.hardware.config.accessory.AccessoryType;
 import com.chsrobotics.ftccore.pipeline.Pipeline;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
@@ -19,13 +20,14 @@ import org.firstinspires.ftc.teamcode.actions.WaitLiftAction;
 import org.firstinspires.ftc.teamcode.util.RobotConstants;
 import org.firstinspires.ftc.teamcode.util.SignalSleeveDetector;
 
+@Autonomous
 public class RBLRAuto extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         Config config = new Config.Builder()
                 .setDriveMotors("m0", "m1", "m2", "m3")
-                .addAccessory(new Accessory(AccessoryType.ODOMETRY_POD, "p0"))
-                .addAccessory(new Accessory(AccessoryType.ODOMETRY_POD, "p1"))
+//                .addAccessory(new Accessory(AccessoryType.ODOMETRY_POD, "p0"))
+//                .addAccessory(new Accessory(AccessoryType.ODOMETRY_POD, "p1"))
                 .setOdometryWheelProperties(537.7f, 96, 0, 0)
 
                 .addAccessory(new Accessory(AccessoryType.MOTOR, "l0"))
@@ -51,18 +53,21 @@ public class RBLRAuto extends LinearOpMode {
 
         HardwareManager manager = new HardwareManager(config, hardwareMap);
 
-        SignalSleeveDetector.initializeTensorFlow(manager, telemetry);
+        manager.accessoryMotors[0].setDirection(DcMotorSimple.Direction.REVERSE);
+
+
+//        SignalSleeveDetector.initializeTensorFlow(manager, telemetry);
 
         waitForStart();
 
         double parkingPose = 0;
 
-        SignalSleeveDetector.Zone zone = SignalSleeveDetector.detectZone();
-
-        if (zone == SignalSleeveDetector.Zone.ZONE_ONE)
-            parkingPose = 500;
-        else if (zone == SignalSleeveDetector.Zone.ZONE_THREE)
-            parkingPose = -500;
+//        SignalSleeveDetector.Zone zone = SignalSleeveDetector.detectZone();
+//
+//        if (zone == SignalSleeveDetector.Zone.ZONE_ONE)
+//            parkingPose = 500;
+//        else if (zone == SignalSleeveDetector.Zone.ZONE_THREE)
+//            parkingPose = -500;
 
         Pipeline pipeline = new Pipeline.Builder(manager)
                 .addAction(new ContinuousLiftAction(manager))

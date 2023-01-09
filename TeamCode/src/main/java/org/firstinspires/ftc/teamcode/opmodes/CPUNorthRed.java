@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
+import com.chsrobotics.ftccore.engine.navigation.control.PIDParams;
 import com.chsrobotics.ftccore.engine.navigation.path.PrecisionMode;
 import com.chsrobotics.ftccore.engine.navigation.path.TrapezoidalMotionProfile;
 import com.chsrobotics.ftccore.geometry.Position;
@@ -103,10 +104,10 @@ public class CPUNorthRed extends LinearOpMode {
                 .addAction(new SetClawAction(manager, false))
                 .addAction(new WaitAction(manager, 300))
                 .addAction(new UpdateLiftAction(manager, 730))
-                .changePID(new PIDCoefficients(6.5, 0.0012, 0.21))
+                .changePID(new PIDParams(6.5, 0.0012, 0.21))
                 .addLinearPath(PrecisionMode.LOW,
                         new Position(-220, 910, 0))
-                .changePID(new PIDCoefficients(4.5, 0.0012, 0.21))
+                .changePID(new PIDParams(4.5, 0.0012, 0.21))
                 .addLinearPath(PrecisionMode.LOW, new TrapezoidalMotionProfile(500, 1000), false,
                         new Position(575, 935, 270, 1.4))
                 .addAction(new SetClawAction(manager, true))

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
+import com.chsrobotics.ftccore.engine.navigation.control.PID;
+import com.chsrobotics.ftccore.engine.navigation.control.PIDParams;
 import com.chsrobotics.ftccore.engine.navigation.path.PrecisionMode;
 import com.chsrobotics.ftccore.engine.navigation.path.Tolerances;
 import com.chsrobotics.ftccore.engine.navigation.path.TrapezoidalMotionProfile;
@@ -110,10 +112,10 @@ public class CPUNorthBlue extends LinearOpMode {
                 .addAction(new SetClawAction(manager, false))
                 .addAction(new WaitAction(manager, 300))
                 .addAction(new UpdateLiftAction(manager, 730))
-                .changePID(new PIDCoefficients(6.5, 0.0012, 0.21))
+                .changePID(new PIDParams(6.5, 0.0012, 0.21))
                 .addLinearPath(PrecisionMode.LOW,
                         new Position(275, 910, 0))
-                .changePID(new PIDCoefficients(4.5, 0.0012, 0.21))
+                .changePID(new PIDParams(4.5, 0.0012, 0.21))
                 .addLinearPath(PrecisionMode.LOW, new TrapezoidalMotionProfile(500, 1000), false,
                         new Position(-510, 915, 90, 1.3))
                 .addAction(new SetClawAction(manager, true))
@@ -128,7 +130,6 @@ public class CPUNorthBlue extends LinearOpMode {
                 .addLinearPath(new TrapezoidalMotionProfile(700, 1500), false,
                         new Position(parkingPos, 920, 0))
                 .addAction(new WaitLiftAction(manager))
-                .addLinearPath()
                 .build();
 
         pipeline.execute();
