@@ -23,6 +23,8 @@ import org.firstinspires.ftc.teamcode.actions.WaitLiftAction;
 import org.firstinspires.ftc.teamcode.util.RobotConstants;
 import org.firstinspires.ftc.teamcode.util.SignalSleeveDetector;
 
+import java.io.IOException;
+
 @Autonomous
 public class LBRRAuto extends LinearOpMode {
     public static Pipeline pipeline;
@@ -31,20 +33,22 @@ public class LBRRAuto extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         Config config = new Config.Builder()
                 .setDriveMotors("m0", "m1", "m2", "m3")
-                .setOdometryWheelProperties(537.7f, 96, 0, 0)
+                .setOdometryWheelProperties(8192, 35, 0, 0)
                 .addAccessory(new Accessory(AccessoryType.MOTOR, "l0"))
                 .addAccessory(new Accessory(AccessoryType.SERVO, "s0"))
                 .addAccessory(new Accessory(AccessoryType.SERVO, "s1"))
+                .addAccessory(new Accessory(AccessoryType.WEBCAM, "webcam"))
+                .addAccessory(new Accessory(AccessoryType.ODOMETRY_POD, "o0"))
+                .addAccessory(new Accessory(AccessoryType.ODOMETRY_POD, "o1"))
                 .setNavigationTolerances(RobotConstants.mediumPrecision)
                 .setHighPrecisionTolerances(RobotConstants.highPrecision)
                 .setLowPrecisionTolerances(RobotConstants.lowPrecision)
+                .useCV()
                 .useDegrees(true)
-                .addAccessory(new Accessory(AccessoryType.WEBCAM, "webcam"))
                 .setMotorDirection(DcMotorSimple.Direction.FORWARD)
                 .setIMU("imu")
                 .setOpMode(this)
                 .setPIDCoefficients(RobotConstants.linear, RobotConstants.rotation)
-                .useCV()
                 .setDebugMode(true)
                 .build();
 
@@ -52,74 +56,89 @@ public class LBRRAuto extends LinearOpMode {
 
         manager.accessoryMotors[0].setDirection(DcMotorSimple.Direction.REVERSE);
 
+        CVUtility cv = null;
+        try {
+            cv = new CVUtility(manager, telemetry);
+        } catch (Exception e) {
+            telemetry.addLine("CVUtility failed to initialized");
+            telemetry.update();
+        }
 
-//        SignalSleeveDetector.initializeTensorFlow(manager, telemetry);
+        try {
+            SignalSleeveDetector.initializeTensorFlow(manager, telemetry, cv);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         waitForStart();
 
+        SignalSleeveDetector.Zone zone;
+
+        zone = SignalSleeveDetector.detectZone(cv, telemetry);
+
         double parkingPose = 0;
 
-//        SignalSleeveDetector.Zone zone = SignalSleeveDetector.detectZone();
-//
-//        if (zone == SignalSleeveDetector.Zone.ZONE_ONE)
-//            parkingPose = 500;
-//        else if (zone == SignalSleeveDetector.Zone.ZONE_THREE)
-//            parkingPose = -500;
+        if (zone == SignalSleeveDetector.Zone.ZONE_ONE)
+            parkingPose = 500;
+        else if (zone == SignalSleeveDetector.Zone.ZONE_THREE)
+            parkingPose = -500;
+
 
         pipeline = new Pipeline.Builder(manager)
-                .addAction(new ContinuousLiftAction(manager))
-                .addAction(new ContinuousDebugAction(manager, FtcDashboard.getInstance(), pipeline))
+                .addContinuousAction(new ContinuousLiftAction(manager))
                 .addAction(new SetClawAction(manager, true)) //Close claw
                 .addAction(new UpdateLiftAction(manager, 300)) //Set claw up a little bit to prevent dragging
-                .addLinearPath(PrecisionMode.LOW, new TrapezoidalMotionProfile(600, 1000), //Drive to C1
+                .addLinearPath(PrecisionMode.LOW, new TrapezoidalMotionProfile(730, 1000), //Drive to C1
                         new Position(520, 100, 0 ))
 
                 .addAction(new UpdateLiftAction(manager, 2000)) //Raise lift to 3000 ticks to prevent tipping
-                .addLinearPath(PrecisionMode.LOW, new TrapezoidalMotionProfile(600, 1300), //Drive to C3
-                        new Position(520, 1000, 0))
+                .addLinearPath(PrecisionMode.LOW, new TrapezoidalMotionProfile(730, 1000), //Drive to C3
+                        new Position(520, 980, 0))
 
                 .addAction(new UpdateLiftAction(manager, 4400)) //Raise lift to max height
-                .addLinearPath(PrecisionMode.MEDIUM, new TrapezoidalMotionProfile(600, 1000), //Drive to B3
-                        new Position(400, 1000, 0))
+                .addLinearPath(PrecisionMode.MEDIUM, new TrapezoidalMotionProfile(700, 1000), //Drive to B3
+                        new Position(220, 970, 0))
                 .addAction(new WaitLiftAction(manager)) //Wait for lift to climb to proper height
                 .addAction(new SetClawAction(manager, false)) //Release claw
                 .addAction(new WaitAction(manager, 300)) //Wait for 300ms so claw can release
                 .addAction(new UpdateLiftAction(manager, 850)) //Lower lift to top cone of stack
 
-                .addLinearPath(PrecisionMode.MEDIUM, new TrapezoidalMotionProfile(600, 1000), //Drive to A3
-                        new Position(-520, 950, 90, 1))
+                .addLinearPath(PrecisionMode.MEDIUM, new TrapezoidalMotionProfile(730, 1000), //Drive to A3
+                        new Position(-520, 950, 90, 0.5))
                 .addAction(new SetClawAction(manager, true)) //Close claw
                 .addAction(new WaitAction(manager, 300)) //Wait for 300ms so claw can close
                 .addAction(new UpdateLiftAction(manager, 1500)) //Raise lift to prevent from dragging stack down
                 .addAction(new WaitLiftAction(manager)) //Wait for lift to climb to proper height
                 .addAction(new UpdateLiftAction(manager, 4400)) //Raise lift to max height
 
-                .addLinearPath(PrecisionMode.MEDIUM, new TrapezoidalMotionProfile(600, 1000), //Drive to B3
-                        new Position(305, 1000, 0, 1))
+                .addLinearPath(PrecisionMode.MEDIUM, new TrapezoidalMotionProfile(700, 1000), //Drive to B3
+                        new Position(305, 970, 0, 0.5))
                 .addAction(new WaitLiftAction(manager)) //Wait for lift to climb to proper height
                 .addAction(new SetClawAction(manager, false)) //Release claw
                 .addAction(new WaitAction(manager, 300)) //Wait for 300ms so claw can release
                 .addAction(new UpdateLiftAction(manager, 750)) //Lower lift to top cone of stack
 
-                .addLinearPath(PrecisionMode.MEDIUM, new TrapezoidalMotionProfile(600, 1000), //Drive to A3
-                        new Position(-520, 950, 90, 1))
+                .addLinearPath(PrecisionMode.MEDIUM, new TrapezoidalMotionProfile(730, 1000), //Drive to A3
+                        new Position(-520, 950, 90, 0.5))
                 .addAction(new SetClawAction(manager, true)) //Close claw
                 .addAction(new WaitAction(manager, 300)) //Wait for 300ms so claw can close
                 .addAction(new UpdateLiftAction(manager, 1500)) //Raise lift to prevent from dragging stack down
                 .addAction(new WaitLiftAction(manager)) //Wait for lift to climb to proper height
                 .addAction(new UpdateLiftAction(manager, 4400)) //Raise lift to max height
 
-                .addLinearPath(PrecisionMode.MEDIUM, new TrapezoidalMotionProfile(600, 1000), //Drive to B3
-                        new Position(305, 1000, 0, 1))
+                .addLinearPath(PrecisionMode.MEDIUM, new TrapezoidalMotionProfile(700, 1000), //Drive to B3
+                        new Position(305, 970, 0, 0.5))
                 .addAction(new WaitLiftAction(manager)) //Wait for lift to climb to proper height
                 .addAction(new SetClawAction(manager, false)) //Release claw
                 .addAction(new WaitAction(manager, 300)) //Wait for 300ms so claw can release
-                .addAction(new UpdateLiftAction(manager, 100)) //Lower lift to top cone of stack
-                .addLinearPath(PrecisionMode.MEDIUM, new TrapezoidalMotionProfile(600, 1000), //Drive to B3, Parking Position
+                .addAction(new UpdateLiftAction(manager, 200)) //Lower lift to top cone of stack
+                .addLinearPath(PrecisionMode.MEDIUM, new TrapezoidalMotionProfile(730, 1000), //Drive to B3, Parking Position
                         new Position(305, 950, 0),
                         new Position(parkingPose, 950, 0))
                 .build();
 
-        pipeline.execute();
+        ContinuousDebugAction.pipeline = pipeline;
+
+       // pipeline.execute();
     }
 }

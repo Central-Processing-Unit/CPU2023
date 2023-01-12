@@ -9,46 +9,9 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class TestOpMode extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
-        DcMotorEx m0 = hardwareMap.get(DcMotorEx.class, "m0");
-        DcMotorEx m1= hardwareMap.get(DcMotorEx.class, "m1");
-        DcMotorEx m2 = hardwareMap.get(DcMotorEx.class, "m2");
-        DcMotorEx m3 = hardwareMap.get(DcMotorEx.class, "m3");
+        DcMotorEx m0 = hardwareMap.get(DcMotorEx.class, "l0");
 
-        long time = System.currentTimeMillis() + 2000;
-
-        m0.setPower(1);
-
-        while (System.currentTimeMillis() < time)
-        {
-            //nothing
-        }
-
-        time += 2000;
-
-        m1.setPower(1);
-
-        while (System.currentTimeMillis() < time)
-        {
-            //nothing
-        }
-
-        time += 2000;
-
-        m2.setPower(1);
-
-        while (System.currentTimeMillis() < time)
-        {
-            //nothing
-        }
-
-        time += 2000;
-
-        m3.setPower(1);
-
-        while (System.currentTimeMillis() < time)
-        {
-            //nothing
-        }
-
+        while (!isStopRequested())
+            m0.setPower(-0.5);
     }
 }

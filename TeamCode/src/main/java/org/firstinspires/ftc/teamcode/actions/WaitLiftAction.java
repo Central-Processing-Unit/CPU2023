@@ -10,9 +10,11 @@ public class WaitLiftAction extends Action {
 
     @Override
     public void execute() {
-        while (Math.abs(ContinuousLiftAction.targetLiftPos - hardware.getLiftMotor().getCurrentPosition()) > 30)
+        while (ContinuousLiftAction.targetLiftPos - Math.abs(hardware.getLiftMotor().getCurrentPosition()) > 30)
         {
             ContinuousLiftAction.manualLift();
+            hardware.opMode.telemetry.addData("Lift", hardware.getLiftMotor().getCurrentPosition());
+            hardware.opMode.telemetry.update();
         }
     }
 }

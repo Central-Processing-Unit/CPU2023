@@ -8,8 +8,8 @@ import com.qualcomm.robotcore.hardware.PIDCoefficients;
 
 @Config
 public class RobotConstants {
-    public static PIDParams rotation = new PIDParams(530, 0.01, 0.2);
-    public static PIDParams linear = new PIDParams(4.5, 0.0012, 0.21);
+    public static PIDParams rotation = new PIDParams(550, 0, 0);
+    public static PIDParams linear = new PIDParams(5.3, 0, 0);
     public static Tolerances lowPrecision = new Tolerances(30, 0.15);
     public static Tolerances mediumPrecision = new Tolerances(20, 0.1);
     public static Tolerances highPrecision = new Tolerances(12, 0.08);

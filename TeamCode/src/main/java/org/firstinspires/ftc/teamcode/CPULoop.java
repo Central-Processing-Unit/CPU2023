@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesOrder.ZYX;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.chsrobotics.ftccore.engine.navigation.control.PID;
+import com.chsrobotics.ftccore.engine.navigation.control.PIDParams;
 import com.chsrobotics.ftccore.hardware.HardwareManager;
 import com.chsrobotics.ftccore.teleop.Drive;
 import com.chsrobotics.ftccore.teleop.UserDriveLoop;
@@ -18,7 +19,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
 public class CPULoop extends UserDriveLoop {
 
-    private final PID liftController = new PID(new PIDCoefficients(0.003, 0, 0));private double liftTarget;
+    private final PID liftController = new PID(new PIDParams(0.003, 0, 0));
+    private double liftTarget;
     private double liftLimit = 11200;
     private long bLastPressed = -1;
     private boolean isClawClosed = false;

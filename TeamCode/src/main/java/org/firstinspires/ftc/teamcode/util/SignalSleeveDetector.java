@@ -1,100 +1,115 @@
 package org.firstinspires.ftc.teamcode.util;
 
-import android.graphics.Path;
-
 import com.chsrobotics.ftccore.hardware.HardwareManager;
 import com.chsrobotics.ftccore.vision.CVUtility;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.vuforia.Vuforia;
 
-import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
-import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
-import org.firstinspires.ftc.teamcode.util.OpModeHolder;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
-import org.openftc.easyopencv.OpenCvCamera;
-import org.openftc.easyopencv.OpenCvCameraFactory;
-import org.openftc.easyopencv.OpenCvCameraRotation;
-import org.tensorflow.lite.TensorFlowLite;
+import org.outoftheboxrobotics.tensorflowapi.ImageClassification.TFICBuilder;
+import org.outoftheboxrobotics.tensorflowapi.ImageClassification.TensorImageClassifier;
 
+import java.io.IOException;
 import java.util.List;
 
 public class SignalSleeveDetector {
 
-    private static VuforiaLocalizer vuforia;
-    private static TFObjectDetector tfod;
+    private static TensorImageClassifier classifier;
+    public static boolean started = false;
 
-    public static void initializeTensorFlow(HardwareManager manager, Telemetry telem)
-    {
-        try {
-            VuforiaLocalizer.Parameters params = new VuforiaLocalizer.Parameters();
-
-            params.vuforiaLicenseKey = RobotConstants.vuforiaKey;
-            params.cameraName = manager.getWebcam();
-
-            vuforia = ClassFactory.getInstance().createVuforia(params);
-
-            TFObjectDetector.Parameters tfParams = new TFObjectDetector.Parameters();
-
-            tfParams.minResultConfidence = 0.6f;
-            tfParams.isModelTensorFlow2 = true;
-            tfParams.inputSize = 300;
-
-            tfod = ClassFactory.getInstance().createTFObjectDetector(tfParams, vuforia);
-
-            tfod.loadModelFromFile(RobotConstants.asset);
-        } catch (Exception e)
+    public static void initializeTensorFlow(HardwareManager manager, Telemetry telem, CVUtility cv) throws IOException {
+        while (!cv.initialized)
         {
-            tfod = null;
-        }
-
-        if (tfod != null) {
-            tfod.activate();
-
-            tfod.setZoom(1.0, 16.0/9.0);
-
-            telem.addData("Ready to start.", "");
+            telem.addData("Initializing", "");
             telem.update();
         }
+
+        telem.clearAll();
+
+        classifier = new TFICBuilder(manager.hardwareMap, "bulldogsVision.tflite", "Dot 1", "Dot 2", "Dot 3")
+                .useXNNPack(true)
+                .build();
+
+//        try {
+//            VuforiaLocalizer.Parameters params = new VuforiaLocalizer.Parameters();
+//
+//            params.vuforiaLicenseKey = RobotConstants.vuforiaKey;
+//            params.cameraName = manager.hardwareMap.get(WebcamName.class, "Webcam 1");
+//
+//            vuforia = ClassFactory.getInstance().createVuforia(params);
+//
+//            TFObjectDetector.Parameters tfParams = new TFObjectDetector.Parameters();
+//
+//            tfParams.minResultConfidence = 0.6f;
+//            tfParams.isModelTensorFlow2 = true;
+//            tfParams.inputSize = 300;
+//
+//            tfod = ClassFactory.getInstance().createTFObjectDetector(tfParams, vuforia);
+//
+//            tfod.loadModelFromFile(RobotConstants.asset);
+//        } catch (Exception e)
+//        {
+//            tfod = null;
+//        }
+//
+//        if (tfod != null) {
+//            tfod.activate();
+//
+//            tfod.setZoom(1.0, 16.0/9.0);
+//
+//            telem.addData("Ready to start.", "");
+//            telem.update();
+//        }
     }
 
-    public static Zone detectZone()
+    public static Zone detectZone(CVUtility cv, Telemetry telem)
     {
-        if (tfod == null)
-            return Zone.ZONE_TWO;
+        assert classifier != null;
 
-        List<Recognition> recognitions = tfod.getUpdatedRecognitions();
+        try {
+            if (classifier == null)
+                return Zone.ZONE_TWO;
 
-        float confidence = 0;
+            float confidence = 0;
 
-        Recognition zone = null;
+            TensorImageClassifier.Recognition zone = null;
 
-        for (Recognition recognition : recognitions)
-        {
+            List<TensorImageClassifier.Recognition> recognitions = classifier.recognize(cv.grabFrame());
+
+            for (TensorImageClassifier.Recognition recognition : recognitions)
+            {
+
+                if (zone == null)
+                    zone = recognition;
+                else if (recognition.getConfidence() > zone.getConfidence())
+                    zone = recognition;
+            }
+
             if (zone == null)
-                zone = recognition;
-            else if (recognition.getConfidence() > zone.getConfidence())
-                zone = recognition;
-        }
+                return Zone.ZONE_TWO;
 
-        if (zone == null)
-            return Zone.ZONE_TWO;
+            telem.addData("Detection success", zone.getTitle() );
+            telem.update();
 
-        switch (zone.getLabel())
+            switch (zone.getTitle())
+            {
+                case "Dot 1":
+                    return Zone.ZONE_ONE;
+                case "Dot 2":
+                    return Zone.ZONE_TWO;
+                case "Dot 3":
+                    return Zone.ZONE_THREE;
+                default:
+                    return Zone.ZONE_TWO;
+            }
+
+        } catch (Exception e)
         {
-            case "1":
-                return Zone.ZONE_ONE;
-            case "2":
-                return Zone.ZONE_TWO;
-            case "3":
-                return Zone.ZONE_THREE;
-            default:
-                return Zone.ZONE_TWO;
+            telem.addData("Detection failed.", "Defaulting to Zone 2");
+            telem.update();
+            return Zone.ZONE_TWO;
         }
     }
 

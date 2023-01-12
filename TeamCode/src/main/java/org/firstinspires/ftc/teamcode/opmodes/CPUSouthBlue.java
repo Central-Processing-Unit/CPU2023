@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmodes;
 
+import com.chsrobotics.ftccore.engine.navigation.control.PID;
+import com.chsrobotics.ftccore.engine.navigation.control.PIDParams;
 import com.chsrobotics.ftccore.geometry.Position;
 import com.chsrobotics.ftccore.hardware.HardwareManager;
 import com.chsrobotics.ftccore.hardware.config.Config;
@@ -36,7 +38,7 @@ public class CPUSouthBlue extends LinearOpMode {
                 .setIMU("imu")
 //                .addAccessory(new Accessory(AccessoryType.WEBCAM, "webcam"))
                 .setOpMode(this)
-                .setPIDCoefficients(new PIDCoefficients(3.2, 0.001,0 ), new PIDCoefficients(550, 0.04, 0))
+                .setPIDCoefficients(new PIDParams(3.2, 0.001,0 ), new PIDParams(550, 0.04, 0))
                 //.useCV()
                 .setDebugMode(true)
                 .build();

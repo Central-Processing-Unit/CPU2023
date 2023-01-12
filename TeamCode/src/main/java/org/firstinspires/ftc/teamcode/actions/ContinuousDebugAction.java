@@ -16,14 +16,11 @@ import java.util.ArrayList;
 
 public class ContinuousDebugAction extends ContinuousAction {
     private final FtcDashboard dashboard;
-    private LocalizationEngine engine;
-    private Pipeline pipeline;
+    public static Pipeline pipeline;
 
-    public ContinuousDebugAction(HardwareManager hardware, FtcDashboard dashboard, Pipeline pipeline) {
+    public ContinuousDebugAction(HardwareManager hardware, FtcDashboard dashboard) {
         super(hardware);
         this.dashboard = dashboard;
-        this.engine = pipeline.localization;
-        this.pipeline = pipeline;
     }
 
     @Override
@@ -34,7 +31,7 @@ public class ContinuousDebugAction extends ContinuousAction {
                 .setStrokeWidth(1)
                 .setFill("goldenrod")
                 .setStroke("black")
-                .fillCircle(engine.getCurrentPosition().x, engine.getCurrentPosition().y, 100);
+                .fillCircle(LocalizationEngine.position.x, LocalizationEngine.position.y, 1);
 
         ArrayList<Position> positions = new ArrayList<>();
 
