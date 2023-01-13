@@ -4,12 +4,12 @@ import com.chsrobotics.ftccore.hardware.HardwareManager;
 import com.chsrobotics.ftccore.vision.CVUtility;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.util.tensorflowapi.ImageClassification.TFICBuilder;
+import org.firstinspires.ftc.teamcode.util.tensorflowapi.ImageClassification.TensorImageClassifier;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
-import org.outoftheboxrobotics.tensorflowapi.ImageClassification.TFICBuilder;
-import org.outoftheboxrobotics.tensorflowapi.ImageClassification.TensorImageClassifier;
 
 import java.io.IOException;
 import java.util.List;
@@ -28,8 +28,7 @@ public class SignalSleeveDetector {
 
         telem.clearAll();
 
-        classifier = new TFICBuilder(manager.hardwareMap, "bulldogsVision.tflite", "Dot 1", "Dot 2", "Dot 3")
-                .useXNNPack(true)
+        classifier = new TFICBuilder(manager.hardwareMap, "bulldogsvision.tflite", "Dot 1", "Dot 2", "Dot 3")
                 .build();
 
 //        try {

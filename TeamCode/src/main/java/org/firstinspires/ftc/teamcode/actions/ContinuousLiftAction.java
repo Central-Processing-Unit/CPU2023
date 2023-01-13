@@ -30,8 +30,6 @@ public class ContinuousLiftAction extends ContinuousAction {
         double liftPosError = targetLiftPos - liftPos;
         double output = controller.getOutput(liftPosError, 0);
         hardware.getLiftMotor().setPower(output);
-        manager.opMode.telemetry.addData("Lift pos", hardware.getLiftMotor().getCurrentPosition());
-        manager.opMode.telemetry.update();
     }
 
     @Override
