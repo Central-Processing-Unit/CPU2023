@@ -4,155 +4,114 @@ import com.chsrobotics.ftccore.hardware.HardwareManager;
 import com.chsrobotics.ftccore.vision.CVUtility;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.util.tensorflowapi.ImageClassification.TFICBuilder;
 import org.firstinspires.ftc.teamcode.util.tensorflowapi.ImageClassification.TensorImageClassifier;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
+import org.openftc.apriltag.AprilTagDetection;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class SignalSleeveDetector {
 
     private static TensorImageClassifier classifier;
     public static boolean started = false;
+    public static Zone zone;
+    public static OpenCvCamera camera;
+    private static AprilTagDetectionPipeline pipeline;
 
-    public static void initializeTensorFlow(HardwareManager manager, Telemetry telem, CVUtility cv) throws IOException {
-        while (!cv.initialized)
-        {
-            telem.addData("Initializing", "");
-            telem.update();
-        }
+    private static double fx = 578.272;
+    private static double fy = 578.272;
+    private static double cx = 402.145;
+    private static double cy = 221.506;
 
-        telem.clearAll();
+    // UNITS ARE METERS
+    static double tagsize = 0.041;
+    private static int numFramesWithoutDetection = 0;
 
-        classifier = new TFICBuilder(manager.hardwareMap, "bulldogsvision.tflite", "Dot 1", "Dot 2", "Dot 3")
-                .build();
+    static final float DECIMATION_HIGH = 3;
+    static final float DECIMATION_LOW = 2;
+    static final float THRESHOLD_HIGH_DECIMATION_RANGE_METERS = 1.0f;
+    static final int THRESHOLD_NUM_FRAMES_NO_DETECTION_BEFORE_LOW_DECIMATION = 4;
 
-//        try {
-//            VuforiaLocalizer.Parameters params = new VuforiaLocalizer.Parameters();
-//
-//            params.vuforiaLicenseKey = RobotConstants.vuforiaKey;
-//            params.cameraName = manager.hardwareMap.get(WebcamName.class, "Webcam 1");
-//
-//            vuforia = ClassFactory.getInstance().createVuforia(params);
-//
-//            TFObjectDetector.Parameters tfParams = new TFObjectDetector.Parameters();
-//
-//            tfParams.minResultConfidence = 0.6f;
-//            tfParams.isModelTensorFlow2 = true;
-//            tfParams.inputSize = 300;
-//
-//            tfod = ClassFactory.getInstance().createTFObjectDetector(tfParams, vuforia);
-//
-//            tfod.loadModelFromFile(RobotConstants.asset);
-//        } catch (Exception e)
-//        {
-//            tfod = null;
-//        }
-//
-//        if (tfod != null) {
-//            tfod.activate();
-//
-//            tfod.setZoom(1.0, 16.0/9.0);
-//
-//            telem.addData("Ready to start.", "");
-//            telem.update();
-//        }
-    }
-
-    public static Zone detectZone(CVUtility cv, Telemetry telem)
+    public static void initAprilTags(HardwareManager manager)
     {
-        assert classifier != null;
+        int cameraMonitorViewId = manager.hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", manager.hardwareMap.appContext.getPackageName());
+        camera = OpenCvCameraFactory.getInstance().createWebcam(manager.accessoryCameras[0], cameraMonitorViewId);
+        pipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
 
-        try {
-            if (classifier == null)
-                return Zone.ZONE_TWO;
-
-            float confidence = 0;
-
-            TensorImageClassifier.Recognition zone = null;
-
-            List<TensorImageClassifier.Recognition> recognitions = classifier.recognize(cv.grabFrame());
-
-            for (TensorImageClassifier.Recognition recognition : recognitions)
-            {
-
-                if (zone == null)
-                    zone = recognition;
-                else if (recognition.getConfidence() > zone.getConfidence())
-                    zone = recognition;
-            }
-
-            if (zone == null)
-                return Zone.ZONE_TWO;
-
-            telem.addData("Detection success", zone.getTitle() );
-            telem.update();
-
-            switch (zone.getTitle())
-            {
-                case "Dot 1":
-                    return Zone.ZONE_ONE;
-                case "Dot 2":
-                    return Zone.ZONE_TWO;
-                case "Dot 3":
-                    return Zone.ZONE_THREE;
-                default:
-                    return Zone.ZONE_TWO;
-            }
-
-        } catch (Exception e)
+        camera.setPipeline(pipeline);
+        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
         {
-            telem.addData("Detection failed.", "Defaulting to Zone 2");
-            telem.update();
-            return Zone.ZONE_TWO;
-        }
+            @Override
+            public void onOpened()
+            {
+                camera.startStreaming(800,448, OpenCvCameraRotation.UPRIGHT);
+            }
+
+            @Override
+            public void onError(int errorCode)
+            {
+
+            }
+        });
     }
 
-    public static int detectOrientation(Mat mat) {
-        if (mat == null) {
-            return 1;
-        }
+    public static void detect(HardwareManager manager) {
+        ArrayList<AprilTagDetection> currentDetections = pipeline.getLatestDetections();
 
-        // Do color detection
-        Mat hsvMat = new Mat();
-        Imgproc.cvtColor(mat, hsvMat, Imgproc.COLOR_RGB2HSV);
-        Mat green = new Mat();
-        Core.inRange(hsvMat, new Scalar(35, 40, 35), new Scalar(70, 120, 255), green);
-        int greenIndex = 0;
-        for (int i = green.rows() / 3; i < green.rows() * 2 / 3; i += 5) {
-            for (int j = green.cols() / 3; j < green.cols() * 2 / 3; j += 5) {
-                if (green.get(i,j)[0] != 0) {
-                    greenIndex++;
+
+        if(currentDetections != null)
+        {
+            manager.opMode.telemetry.addData("FPS", camera.getFps());
+            manager.opMode.telemetry.addData("Overhead ms", camera.getOverheadTimeMs());
+            manager.opMode.telemetry.addData("Pipeline ms", camera.getPipelineTimeMs());
+
+            // If we don't see any tags
+            if(currentDetections.size() == 0)
+            {
+                numFramesWithoutDetection++;
+
+                // If we haven't seen a tag for a few frames, lower the decimation
+                // so we can hopefully pick one up if we're e.g. far back
+                if(numFramesWithoutDetection >= THRESHOLD_NUM_FRAMES_NO_DETECTION_BEFORE_LOW_DECIMATION)
+                {
+                    pipeline.setDecimation(DECIMATION_LOW);
+                }
+            }
+            // We do see tags!
+            else
+            {
+                numFramesWithoutDetection = 0;
+
+                // If the target is within 1 meter, turn on high decimation to
+                // increase the frame rate
+                if(currentDetections.get(0).pose.z < THRESHOLD_HIGH_DECIMATION_RANGE_METERS)
+                {
+                    pipeline.setDecimation(DECIMATION_HIGH);
+                }
+
+                for(AprilTagDetection detection : currentDetections)
+                {
+                    for (AprilTagDetection tag : currentDetections) {
+                        if (tag.id == 0) {
+                            zone = Zone.ZONE_ONE;
+                        } else if (tag.id == 1)
+                            zone = Zone.ZONE_TWO;
+                        else if (tag.id == 2)
+                            zone = Zone.ZONE_THREE;
+                    }
                 }
             }
         }
-        Mat blue = new Mat();
-        Core.inRange(hsvMat, new Scalar(75, 80, 35), new Scalar(130, 170, 255), blue);
-        int blueIndex = 0;
-        for (int i = blue.rows() / 3; i < blue.rows() * 2 / 3; i += 5) {
-            for (int j = blue.cols() / 3; j < blue.cols() * 2 / 3; j += 5) {
-                if (blue.get(i,j)[0] != 0) {
-                    blueIndex++;
-                }
-            }
-        }
-
-        int threshold = 200;
-        OpModeHolder.opMode.telemetry.addData("blueIndex", blueIndex);
-        OpModeHolder.opMode.telemetry.addData("greenIndex", greenIndex);
-
-//        OpModeHolder.opMode.telemetry.update();
-        if (greenIndex > threshold || blueIndex > threshold) {
-            if (greenIndex > blueIndex) {
-                return 2;
-            }
-            return 3;
-        }
-        return 1;
     }
 
     public enum Zone

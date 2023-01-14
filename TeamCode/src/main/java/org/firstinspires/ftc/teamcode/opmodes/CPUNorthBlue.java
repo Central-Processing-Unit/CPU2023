@@ -75,19 +75,6 @@ public class CPUNorthBlue extends LinearOpMode {
 
         waitForStart();
 
-        int dots = 1;
-        if (cv != null && cv.initialized && cv.grabFrame() != null) {
-            dots = org.firstinspires.ftc.teamcode.util.SignalSleeveDetector.detectOrientation(cv.grabFrame());
-
-            telemetry.addData("Dots: ", dots);
-            cv.stopStreaming();
-        } else {
-            telemetry.addLine("Signal sleeve detection failed");
-        }
-
-        parkingPos = dots == 1 ? 500 :
-                (dots == 2 ? 0 : -500);
-
         Pipeline pipeline = new Pipeline.Builder(manager)
                 .addContinuousAction(new ContinuousLiftAction(manager))
                 .addAction(new SetClawAction(manager, true))

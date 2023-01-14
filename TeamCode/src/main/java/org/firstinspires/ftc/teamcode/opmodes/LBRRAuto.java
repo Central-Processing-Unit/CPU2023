@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.opmodes;
 import android.content.res.AssetManager;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.chsrobotics.ftccore.engine.navigation.path.PrecisionMode;
 import com.chsrobotics.ftccore.engine.navigation.path.TrapezoidalMotionProfile;
 import com.chsrobotics.ftccore.geometry.Position;
@@ -62,36 +63,25 @@ public class LBRRAuto extends LinearOpMode {
 
         manager.accessoryMotors[0].setDirection(DcMotorSimple.Direction.REVERSE);
 
-//        CVUtility cv = null;
-//
-//        try {
-//            cv = new CVUtility(manager, telemetry);
-//        } catch (Exception e) {
-//            telemetry.addLine("CVUtility failed to initialized");
-//            telemetry.update();
-//        }
-//
-//        try {
-//            SignalSleeveDetector.initializeTensorFlow(manager, telemetry, cv);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//
-//        SignalSleeveDetector.Zone zone = SignalSleeveDetector.Zone.ZONE_TWO;
-//
-//        while (!isStarted())
-//        {
-//            zone = SignalSleeveDetector.detectZone(cv, telemetry);
-//        }
+        SignalSleeveDetector.initAprilTags(manager);
+
+        SignalSleeveDetector.Zone zone = SignalSleeveDetector.Zone.ZONE_TWO;
+
+        while (!isStarted() && !isStopRequested())
+            SignalSleeveDetector.detect(manager);
 
         waitForStart();
 
+        zone = SignalSleeveDetector.zone;
+
+        SignalSleeveDetector.camera.stopStreaming();
+
         double parkingPose = 0;
 
-//        if (zone == SignalSleeveDetector.Zone.ZONE_ONE)
-//            parkingPose = 500;
-//        else if (zone == SignalSleeveDetector.Zone.ZONE_THREE)
-//            parkingPose = -500;
+        if (zone == SignalSleeveDetector.Zone.ZONE_ONE)
+            parkingPose = 500;
+        else if (zone == SignalSleeveDetector.Zone.ZONE_THREE)
+            parkingPose = -500;
 
         pipeline = new Pipeline.Builder(manager)
                 .addLinearPath(new TrapezoidalMotionProfile(500, 1000), new Position(0, 1220, 45, 1.5))
@@ -152,6 +142,6 @@ public class LBRRAuto extends LinearOpMode {
 
         ContinuousDebugAction.pipeline = pipeline;
 
-       pipeline.execute();
+      // pipeline.execute();
     }
 }
