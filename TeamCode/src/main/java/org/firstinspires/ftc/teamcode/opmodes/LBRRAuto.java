@@ -63,6 +63,9 @@ public class LBRRAuto extends LinearOpMode {
 
         manager.accessoryMotors[0].setDirection(DcMotorSimple.Direction.REVERSE);
 
+        manager.accessoryServos[0].setPosition(0.54);
+        manager.accessoryServos[1].setPosition(0.46);
+
         SignalSleeveDetector.initAprilTags(manager);
 
         SignalSleeveDetector.Zone zone = SignalSleeveDetector.Zone.ZONE_TWO;
@@ -84,27 +87,27 @@ public class LBRRAuto extends LinearOpMode {
             parkingPose = -500;
 
         pipeline = new Pipeline.Builder(manager)
-                .addLinearPath(new TrapezoidalMotionProfile(500, 1000), new Position(0, 1220, 45, 1.5))
-                .build();
+                .addContinuousAction(new ContinuousLiftAction(manager))
+                .addAction(new SetClawAction(manager, true))
+                .addAction(new UpdateLiftAction(manager, 4700, 200))
+                .addLinearPath(PrecisionMode.LOW, new TrapezoidalMotionProfile(770, 1000),
+                        new Position(105, 1300, 315, 1.4))
+                .addAction(new SetClawAction(manager, false))
+                .addAction(new WaitAction(manager, 300))
+                .addAction(new UpdateLiftAction(manager, 1150))
 
-//        pipeline = new Pipeline.Builder(manager)
-//                .addContinuousAction(new ContinuousLiftAction(manager))
-//                .addAction(new SetClawAction(manager, true)) //Close claw
-//                .addAction(new UpdateLiftAction(manager, 300)) //Set claw up a little bit to prevent dragging
-//                .addLinearPath(PrecisionMode.LOW, new TrapezoidalMotionProfile(730, 1000), //Drive to C1
-//                        new Position(520, 100, 0 ))
-//
-//                .addAction(new UpdateLiftAction(manager, 2000)) //Raise lift to 3000 ticks to prevent tipping
-//                .addLinearPath(PrecisionMode.LOW, new TrapezoidalMotionProfile(730, 1000), //Drive to C3
-//                        new Position(520, 980, 0))
-//
-//                .addAction(new UpdateLiftAction(manager, 4400)) //Raise lift to max height
-//                .addLinearPath(PrecisionMode.MEDIUM, new TrapezoidalMotionProfile(700, 1000), //Drive to B3
-//                        new Position(220, 970, 0))
-//                .addAction(new WaitLiftAction(manager)) //Wait for lift to climb to proper height
-//                .addAction(new SetClawAction(manager, false)) //Release claw
-//                .addAction(new WaitAction(manager, 300)) //Wait for 300ms so claw can release
-//                .addAction(new UpdateLiftAction(manager, 850)) //Lower lift to top cone of stack
+                .addLinearPath(PrecisionMode.MEDIUM, new TrapezoidalMotionProfile(700, 1000), //Drive to B3
+                        new Position(-640, 1160, 90, 0.5))
+                .addAction(new SetClawAction(manager, true))
+                .addAction(new WaitAction(manager, 300))
+                .addAction(new UpdateLiftAction(manager, 1500))
+                .addAction(new WaitLiftAction(manager))
+                .addAction(new UpdateLiftAction(manager, 4900))
+
+                .addLinearPath(PrecisionMode.MEDIUM, new TrapezoidalMotionProfile(700, 1000), //Drive to B3
+                        new Position(200, 1200, 0))
+                .addAction(new SetClawAction(manager, false))
+
 //
 //                .addLinearPath(PrecisionMode.MEDIUM, new TrapezoidalMotionProfile(730, 1000), //Drive to A3
 //                        new Position(-520, 950, 90, 0.5))
@@ -138,10 +141,9 @@ public class LBRRAuto extends LinearOpMode {
 //                .addLinearPath(PrecisionMode.MEDIUM, new TrapezoidalMotionProfile(730, 1000), //Drive to B3, Parking Position
 //                        new Position(305, 950, 0),
 //                        new Position(parkingPose, 950, 0))
-//                .build();
+                .build();
 
         ContinuousDebugAction.pipeline = pipeline;
-
-      // pipeline.execute();
+        pipeline.execute();
     }
 }
