@@ -16,6 +16,7 @@ import com.qualcomm.robotcore.hardware.PIDCoefficients;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 public class CPULoop extends UserDriveLoop {
 
@@ -25,6 +26,7 @@ public class CPULoop extends UserDriveLoop {
     private long bLastPressed = -1;
     private boolean isClawClosed = false;
     private boolean precisionMode = false;
+    private boolean ignoreLimits = false;
 
 
     public CPULoop(HardwareManager manager, OpMode mode) {
@@ -45,24 +47,40 @@ public class CPULoop extends UserDriveLoop {
         Gamepad gp2 = hardware.opMode.gamepad2;
 
         double liftPower = 0;
-        if ((gp1.right_trigger > 0.01 || gp2.right_trigger > 0.01)) {
-            if (gp1.right_trigger > 0.01)
-                liftPower = -getLiftSpeed(gp1.right_trigger);
-            else if (gp2.right_trigger > 0.01)
-                liftPower = -getLiftSpeed(gp2.right_trigger);
-            liftTarget = lift.getCurrentPosition();
-        } else if ((gp1.left_trigger > 0.01 || gp2.left_trigger > 0.01)){
-            if (gp1.left_trigger > 0.01)
-                liftPower = getLiftSpeed(gp1.left_trigger);
-            else if (gp2.left_trigger > 0.01)
-                liftPower = getLiftSpeed(gp2.left_trigger);
-            liftTarget = lift.getCurrentPosition();
-        } else {
-            liftPower = liftController.getOutput(liftTarget - lift.getCurrentPosition(), 0);
-            // todo: lift motor goes slower in PID. solution: override PID when it's mildly far from it's target
+
+        boolean limitLift = false;
+
+        if (gp1.right_bumper)
+            ignoreLimits = true;
+        else if (gp1.left_bumper)
+            ignoreLimits = false;
+
+        if (gp1.right_trigger > 0.01 && hardware.accessoryMotors[0].getCurrent(CurrentUnit.AMPS) > 3.5)
+            limitLift = true;
+        else if (gp1.left_trigger > 0.01 && hardware.accessoryMotors[0].getCurrentPosition() < 20)
+            limitLift = true;
+        else if (gp1.right_trigger > 0.01 && hardware.accessoryMotors[0].getCurrentPosition() > -4300)
+            limitLift = true;
+
+        if (!limitLift)
+        {
+            if ((gp1.right_trigger > 0.01 || gp2.right_trigger > 0.01)) {
+                if (gp1.right_trigger > 0.01)
+                    liftPower = -getLiftSpeed(gp1.right_trigger);
+                else if (gp2.right_trigger > 0.01)
+                    liftPower = -getLiftSpeed(gp2.right_trigger);
+                liftTarget = lift.getCurrentPosition();
+            } else if ((gp1.left_trigger > 0.01 || gp2.left_trigger > 0.01)){
+                if (gp1.left_trigger > 0.01)
+                    liftPower = getLiftSpeed(gp1.left_trigger);
+                else if (gp2.left_trigger > 0.01)
+                    liftPower = getLiftSpeed(gp2.left_trigger);
+                liftTarget = lift.getCurrentPosition();
+            } else {
+                liftPower = liftController.getOutput(liftTarget - lift.getCurrentPosition(), 0);
+                // todo: lift motor goes slower in PID. solution: override PID when it's mildly far from it's target
+            }
         }
-
-
 
         opmode.telemetry.addData("Loop Running", "True");
         opmode.telemetry.addData("Claw Closed", isClawClosed? "True" : "False");
@@ -79,33 +97,10 @@ public class CPULoop extends UserDriveLoop {
         if (gp1.x)
             precisionMode = !precisionMode;
 
-        if (precisionMode)
-        {
-            Drive.linearFactor = 0.5;
-            Drive.rotationFactor = 0.5;
-        } else
-        {
-            Drive.linearFactor = 1;
-            Drive.rotationFactor = 1;
-        }
-
         if (gp1.a)
         {
             hardware.IMUReset = hardware.imu.getAngularOrientation(AxesReference.INTRINSIC, ZYX, AngleUnit.RADIANS ).firstAngle;
         }
-
-//        if (gp1.right_bumper)
-//        {
-//            isClawClosed = !isClawClosed;
-//
-//            if (isClawClosed){
-//                hardware.accessoryServos[0].setPosition(0.54);
-//                hardware.accessoryServos[1].setPosition(0.46);
-//            } else {
-//                hardware.accessoryServos[0].setPosition(0.63);
-//                hardware.accessoryServos[1].setPosition(0.32);
-//            }
-//        }
 
         if ((gp1.b || gp2.b || gp1.right_bumper) && System.currentTimeMillis() - bLastPressed > 250) {
             bLastPressed = System.currentTimeMillis();
