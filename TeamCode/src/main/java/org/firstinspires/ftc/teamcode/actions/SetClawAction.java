@@ -16,11 +16,11 @@ public class SetClawAction extends Action {
         if (closed){
 //                hardware.accessoryServos[0].setPosition(0.475);
 //                hardware.accessoryServos[1].setPosition(0.475);
-            hardware.accessoryServos[0].setPosition(0.54);
+            hardware.accessoryServos[0].setPosition(0.57);
             hardware.accessoryServos[1].setPosition(0.46);
         } else {
-            hardware.accessoryServos[0].setPosition(0.66);
-            hardware.accessoryServos[1].setPosition(0.35);
+            hardware.accessoryServos[0].setPosition(0.7);
+            hardware.accessoryServos[1].setPosition(0.31);
         }
     }
 }

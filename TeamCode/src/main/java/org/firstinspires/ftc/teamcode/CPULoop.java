@@ -9,10 +9,12 @@ import com.chsrobotics.ftccore.engine.navigation.control.PIDParams;
 import com.chsrobotics.ftccore.hardware.HardwareManager;
 import com.chsrobotics.ftccore.teleop.Drive;
 import com.chsrobotics.ftccore.teleop.UserDriveLoop;
+import com.qualcomm.hardware.lynx.LynxServoController;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
+import com.qualcomm.robotcore.hardware.ServoControllerEx;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -55,11 +57,9 @@ public class CPULoop extends UserDriveLoop {
         else if (gp1.left_bumper)
             ignoreLimits = false;
 
-        if (gp1.right_trigger > 0.01 && hardware.accessoryMotors[0].getCurrent(CurrentUnit.AMPS) > 3.5)
+        if (gp1.left_trigger > 0.01 && hardware.accessoryMotors[0].getCurrentPosition() > 20)
             limitLift = true;
-        else if (gp1.left_trigger > 0.01 && hardware.accessoryMotors[0].getCurrentPosition() < 20)
-            limitLift = true;
-        else if (gp1.right_trigger > 0.01 && hardware.accessoryMotors[0].getCurrentPosition() > -4300)
+        else if (gp1.right_trigger > 0.01 && hardware.accessoryMotors[0].getCurrentPosition() < -4400)
             limitLift = true;
 
         if (!limitLift)
@@ -109,11 +109,11 @@ public class CPULoop extends UserDriveLoop {
             if (isClawClosed){
 //                hardware.accessoryServos[0].setPosition(0.475);
 //                hardware.accessoryServos[1].setPosition(0.475);
-                hardware.accessoryServos[0].setPosition(0.54);
+                hardware.accessoryServos[0].setPosition(0.57);
                 hardware.accessoryServos[1].setPosition(0.46);
             } else {
-                hardware.accessoryServos[0].setPosition(0.66);
-                hardware.accessoryServos[1].setPosition(0.35);
+                hardware.accessoryServos[0].setPosition(0.7);
+                hardware.accessoryServos[1].setPosition(0.31);
             }
         }
     }

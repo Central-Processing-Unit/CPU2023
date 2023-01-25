@@ -21,7 +21,7 @@ public class CPUTeleop extends LinearOpMode {
                 .addAccessory(new Accessory(AccessoryType.MOTOR, "l0"))
                 //.addAccessory(new Accessory(AccessoryType.MOTOR, "c0"))
                 .setIMU("imu")
-                .setTeleopValues(1, .6)
+                .setTeleopValues(2200, 1800)
                 .setMotorDirection(DcMotorSimple.Direction.FORWARD)
                 .addAccessory(new Accessory(AccessoryType.SERVO, "s0"))
                 .addAccessory(new Accessory(AccessoryType.SERVO, "s1"))
