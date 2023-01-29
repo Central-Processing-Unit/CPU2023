@@ -59,10 +59,14 @@ public class CPULoop extends UserDriveLoop {
 
         if (gp1.left_trigger > 0.01 && hardware.accessoryMotors[0].getCurrentPosition() > 20)
             limitLift = true;
-        else if (gp1.right_trigger > 0.01 && hardware.accessoryMotors[0].getCurrentPosition() < -4400)
+        else if (gp1.right_trigger > 0.01 && hardware.accessoryMotors[0].getCurrentPosition() < -4450)
             limitLift = true;
 
-        if (!limitLift)
+        if (gp1.x)
+            ignoreLimits = !ignoreLimits;
+
+
+        if (!limitLift || ignoreLimits)
         {
             if ((gp1.right_trigger > 0.01 || gp2.right_trigger > 0.01)) {
                 if (gp1.right_trigger > 0.01)
@@ -93,9 +97,6 @@ public class CPULoop extends UserDriveLoop {
 
 
         lift.setPower(liftPower);
-
-        if (gp1.x)
-            precisionMode = !precisionMode;
 
         if (gp1.a)
         {
