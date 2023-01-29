@@ -23,10 +23,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 public class CPULoop extends UserDriveLoop {
 
     private final PID liftController = new PID(new PIDParams(0.003, 0, 0));
+    private final PID antiTipController = new PID(new PIDParams(3.5, 0, 0));
     private double liftTarget;
     private double liftLimit = 11200;
     private long bLastPressed = -1;
+    private long yLastPressed = -1;
+    private long xLastPressed = -1;
     private boolean isClawClosed = false;
+    private boolean antiTip = true;
     private boolean precisionMode = false;
     private boolean ignoreLimits = false;
 
@@ -62,9 +66,33 @@ public class CPULoop extends UserDriveLoop {
         else if (gp1.right_trigger > 0.01 && hardware.accessoryMotors[0].getCurrentPosition() < -4450)
             limitLift = true;
 
-        if (gp1.x)
+        if (gp1.x && System.currentTimeMillis() - xLastPressed > 250) {
+            xLastPressed = System.currentTimeMillis();
             ignoreLimits = !ignoreLimits;
+        }
 
+        if (gp1.y && System.currentTimeMillis() - yLastPressed > 250)
+        {
+            yLastPressed = System.currentTimeMillis();
+            antiTip = !antiTip;
+        }
+
+        double tipAngle = hardware.imu.getAngularOrientation(AxesReference.INTRINSIC, ZYX, AngleUnit.DEGREES).secondAngle;
+        if (antiTip && Math.abs(tipAngle) > 15)
+        {
+            drive.overrideDriveControl = true;
+
+            if (tipAngle < 0)
+            {
+                hardware.driveMotors[0].setVelocity(antiTipController.getOutput(5 - Math.abs(tipAngle), 0));
+            } else
+            {
+                hardware.driveMotors[0].setVelocity(-antiTipController.getOutput(5 - Math.abs(tipAngle), 0));
+            }
+        } else
+        {
+            drive.overrideDriveControl = true;
+        }
 
         if (!limitLift || ignoreLimits)
         {
