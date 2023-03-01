@@ -11,6 +11,7 @@ import com.chsrobotics.ftccore.teleop.Drive;
 import com.chsrobotics.ftccore.teleop.UserDriveLoop;
 import com.qualcomm.hardware.lynx.LynxServoController;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
@@ -29,10 +30,17 @@ public class CPULoop extends UserDriveLoop {
     private boolean isClawClosed = false;
     private boolean precisionMode = false;
     private boolean ignoreLimits = false;
+    private HardwareManager hardware;
+    private DcMotorEx lift;
 
 
     public CPULoop(HardwareManager manager, OpMode mode) {
+
         super(manager, mode);
+        hardware = manager;
+        lift = hardware.accessoryMotors[0];
+        lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public double getLiftSpeed(double input)
@@ -42,8 +50,6 @@ public class CPULoop extends UserDriveLoop {
 
     @Override
     public void loop() {
-        HardwareManager hardware = this.hardware;
-        DcMotorEx lift = hardware.accessoryMotors[0];
        // DcMotorEx claw = hardware.accessoryMotors[1];
         Gamepad gp1 = hardware.opMode.gamepad1;
         Gamepad gp2 = hardware.opMode.gamepad2;
@@ -59,7 +65,7 @@ public class CPULoop extends UserDriveLoop {
 
         if (gp1.left_trigger > 0.01 && hardware.accessoryMotors[0].getCurrentPosition() > 20)
             limitLift = true;
-        else if (gp1.right_trigger > 0.01 && hardware.accessoryMotors[0].getCurrentPosition() < -4450)
+        else if (gp1.right_trigger > 0.01 && hardware.accessoryMotors[0].getCurrentPosition() < -3250)
             limitLift = true;
 
         if (gp1.x)
@@ -113,8 +119,8 @@ public class CPULoop extends UserDriveLoop {
                 hardware.accessoryServos[0].setPosition(0.57);
                 hardware.accessoryServos[1].setPosition(0.46);
             } else {
-                hardware.accessoryServos[0].setPosition(0.7);
-                hardware.accessoryServos[1].setPosition(0.31);
+                hardware.accessoryServos[0].setPosition(0.67);
+                hardware.accessoryServos[1].setPosition(0.33);
             }
         }
     }
