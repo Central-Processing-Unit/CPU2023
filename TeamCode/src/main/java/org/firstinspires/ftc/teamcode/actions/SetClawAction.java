@@ -19,8 +19,8 @@ public class SetClawAction extends Action {
             hardware.accessoryServos[0].setPosition(0.57);
             hardware.accessoryServos[1].setPosition(0.46);
         } else {
-            hardware.accessoryServos[0].setPosition(0.7);
-            hardware.accessoryServos[1].setPosition(0.31);
+            hardware.accessoryServos[0].setPosition(0.67);
+            hardware.accessoryServos[1].setPosition(0.33);
         }
     }
 }
