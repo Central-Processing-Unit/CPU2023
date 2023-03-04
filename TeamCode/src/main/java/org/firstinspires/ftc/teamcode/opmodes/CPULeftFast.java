@@ -11,10 +11,8 @@ import com.chsrobotics.ftccore.hardware.config.accessory.AccessoryType;
 import com.chsrobotics.ftccore.pipeline.Pipeline;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.actions.ContinuousLiftAction;
 import org.firstinspires.ftc.teamcode.actions.SetClawAction;
 import org.firstinspires.ftc.teamcode.actions.UpdateLiftAction;
@@ -26,11 +24,11 @@ import org.firstinspires.ftc.teamcode.util.SignalSleeveDetector;
 
 @Autonomous
 @com.acmerobotics.dashboard.config.Config
-public class CPURight extends LinearOpMode {
+public class CPULeftFast extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        int parkingPos = 200;
+        int parkingPos = -200;
 
         Config config = new Config.Builder()
                 .setDriveMotors("m0", "m1", "m2", "m3")
@@ -46,7 +44,7 @@ public class CPURight extends LinearOpMode {
                 .setMotorDirection(DcMotorSimple.Direction.FORWARD)
                 .setIMU("imu")
                 .setOpMode(this)
-                .setPIDCoefficients(RobotConstants.linear, RobotConstants.rotation)
+                .setPIDCoefficients(RobotConstants.fastLinear, RobotConstants.fastRotation)
                 .setDebugMode(true)
                 .build();
 
@@ -76,53 +74,53 @@ public class CPURight extends LinearOpMode {
         SignalSleeveDetector.camera.stopStreaming();
 
         if (zone == SignalSleeveDetector.Zone.ZONE_ONE)
-            parkingPos = 670;
+            parkingPos = -670;
         else if (zone == SignalSleeveDetector.Zone.ZONE_THREE)
-            parkingPos = -350;
+            parkingPos = 350;
 
         Pipeline pipeline = new Pipeline.Builder(manager)
                 .addContinuousAction(new ContinuousLiftAction(manager))
                 .addAction(new SetClawAction(manager, true))
-                .addAction(new UpdateLiftAction(manager, 3100))
-                .addLinearPath(PrecisionMode.MEDIUM, new TrapezoidalMotionProfile(800, 1600), false,
-                        new Position(-70, 1045, 50, 1.5))
+                .addAction(new UpdateLiftAction(manager, 3000))
+                .addLinearPath(PrecisionMode.MEDIUM, new TrapezoidalMotionProfile(1000, 2000), false,
+                        new Position(70, 1060, 310, 1.2))
                 .addAction(new WaitLiftAction(manager))
                 .addAction(new SetClawAction(manager, false))
                 .addAction(new WaitAction(manager, 300))
-                .addAction(new UpdateLiftAction(manager, 600, 700))
-                .addLinearPath(PrecisionMode.LOW, new TrapezoidalMotionProfile(600, 1300), false,
-                        new Position(545, 980, 270, 1))
+                .addAction(new UpdateLiftAction(manager, 600, 550))
+                .addLinearPath(PrecisionMode.LOW, new TrapezoidalMotionProfile(800, 2000), false,
+                        new Position(-555, 910, 90, 0.3))
                 .addAction(new SetClawAction(manager, true))
                 .addAction(new WaitAction(manager, 300))
-                .addAction(new UpdateLiftAction(manager, 750))
+                .addAction(new UpdateLiftAction(manager, 1200))
                 .addAction(new WaitLiftAction(manager))
                 .addAction(new UpdateLiftAction(manager, 3100))
-                .addLinearPath(PrecisionMode.LOW, new TrapezoidalMotionProfile(800, 1300), false,
-                        new Position(-200, 1025, 0, 1.2))
+                .addLinearPath(PrecisionMode.LOW, new TrapezoidalMotionProfile(1000, 2000), false,
+                        new Position(200, 1030, 0, 1.2))
                 .addAction(new SetClawAction(manager, false))
                 .addAction(new WaitAction(manager, 300))
-                .addAction(new UpdateLiftAction(manager, 500, 700))
-                .addLinearPath(PrecisionMode.LOW, new TrapezoidalMotionProfile(600, 1300), false,
-                        new Position(610, 975, 270, 1.3))
+                .addAction(new UpdateLiftAction(manager, 500, 500))
+                .addLinearPath(PrecisionMode.LOW, new TrapezoidalMotionProfile(800, 2000), false,
+                        new Position(-630, 910, 90, 0.3))
                 .addAction(new SetClawAction(manager, true))
                 .addAction(new WaitAction(manager, 300))
-                .addAction(new UpdateLiftAction(manager, 750))
+                .addAction(new UpdateLiftAction(manager, 1200))
                 .addAction(new WaitLiftAction(manager))
                 .addAction(new UpdateLiftAction(manager, 3100))
-                .addLinearPath(PrecisionMode.LOW, new TrapezoidalMotionProfile(800, 1000), false,
-                        new Position(-130, 1025, 0, 1.2))
+                .addLinearPath(PrecisionMode.LOW, new TrapezoidalMotionProfile(1000, 2000), false,
+                        new Position(130, 1045, 0, 1.2))
                 .addAction(new SetClawAction(manager, false))
                 .addAction(new WaitAction(manager, 300))
-                .addAction(new UpdateLiftAction(manager, 350, 700))
-                .addLinearPath(PrecisionMode.LOW, new TrapezoidalMotionProfile(600, 1300), false,
-                        new Position(685, 975, 270, 1.3))
+                .addAction(new UpdateLiftAction(manager, 350, 500))
+                .addLinearPath(PrecisionMode.LOW, new TrapezoidalMotionProfile(800, 2000), false,
+                        new Position(-670, 910, 90, 0.3))
                 .addAction(new SetClawAction(manager, true))
                 .addAction(new WaitAction(manager, 300))
-                .addAction(new UpdateLiftAction(manager, 750))
+                .addAction(new UpdateLiftAction(manager, 1200))
                 .addAction(new WaitLiftAction(manager))
                 .addAction(new UpdateLiftAction(manager, 3100))
-                .addLinearPath(PrecisionMode.LOW, new TrapezoidalMotionProfile(800, 1000), false,
-                        new Position(-60, 1025, 0, 1.4))
+                .addLinearPath(PrecisionMode.LOW, new TrapezoidalMotionProfile(1000, 2000), false,
+                        new Position(70, 1075, 0, 1.4))
                 .addAction(new SetClawAction(manager, false))
                 .addAction(new UpdateLiftAction(manager, 20, 500))
                 .addLinearPath(new TrapezoidalMotionProfile(700, 1500), false,
@@ -132,6 +130,6 @@ public class CPURight extends LinearOpMode {
                 .build();
 
         pipeline.execute();
-
     }
 }
+

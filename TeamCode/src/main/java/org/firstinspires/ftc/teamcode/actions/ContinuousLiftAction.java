@@ -13,7 +13,7 @@ public class ContinuousLiftAction extends ContinuousAction {
     public static int time = 0;
     private static boolean waiting = false;
     private ElapsedTime timer = new ElapsedTime();
-    private final static PID controller = new PID(new PIDParams(0.006, 0, 0));
+    private final static PID controller = new PID(new PIDParams(0.008, 0, 0));
 
     public ContinuousLiftAction(HardwareManager hardware) {
         super(hardware);

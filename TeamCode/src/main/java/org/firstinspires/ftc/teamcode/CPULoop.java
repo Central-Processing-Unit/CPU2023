@@ -27,11 +27,14 @@ public class CPULoop extends UserDriveLoop {
     private double liftTarget;
     private double liftLimit = 11200;
     private long bLastPressed = -1;
+    private long xLastPressed = -1;
+    private long yLastPressed = -1;
+    private long bumperLastPressed = -1;
     private boolean isClawClosed = false;
     private boolean precisionMode = false;
     private boolean ignoreLimits = false;
     private HardwareManager hardware;
-    private DcMotorEx lift;
+    private final DcMotorEx lift;
 
 
     public CPULoop(HardwareManager manager, OpMode mode) {
@@ -50,7 +53,7 @@ public class CPULoop extends UserDriveLoop {
 
     @Override
     public void loop() {
-       // DcMotorEx claw = hardware.accessoryMotors[1];
+        // DcMotorEx claw = hardware.accessoryMotors[1];
         Gamepad gp1 = hardware.opMode.gamepad1;
         Gamepad gp2 = hardware.opMode.gamepad2;
 
@@ -68,8 +71,27 @@ public class CPULoop extends UserDriveLoop {
         else if (gp1.right_trigger > 0.01 && hardware.accessoryMotors[0].getCurrentPosition() < -3250)
             limitLift = true;
 
-        if (gp1.x)
+        if (gp1.x && System.currentTimeMillis() - xLastPressed > 250) {
+            xLastPressed = System.currentTimeMillis();
             ignoreLimits = !ignoreLimits;
+        }
+
+        if (gp1.y && System.currentTimeMillis() - yLastPressed > 250)
+        {
+            yLastPressed = System.currentTimeMillis();
+            if (Drive.linearMax == 2100)
+                Drive.linearMax = 1900;
+            else
+                Drive.linearMax = 2100;
+        }
+
+        if (gp1.left_bumper && System.currentTimeMillis() - bumperLastPressed > 250)
+        {
+            bumperLastPressed = System.currentTimeMillis();
+            lift.setPower(0);
+            lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
 
 
         if (!limitLift || ignoreLimits)
@@ -98,7 +120,7 @@ public class CPULoop extends UserDriveLoop {
         //opmode.telemetry.addData("Claw Power", claw.getPower());
         opmode.telemetry.addData("Lift Power", liftPower);
         opmode.telemetry.addData("Slide", hardware.accessoryMotors[0].getCurrentPosition());
-       // opmode.telemetry.addData("Claw Ticks", hardware.accessoryMotors[1].getCurrentPosition());
+        // opmode.telemetry.addData("Claw Ticks", hardware.accessoryMotors[1].getCurrentPosition());
         opmode.telemetry.update();
 
 
